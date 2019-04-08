@@ -8,14 +8,14 @@ class Mesh:
     vertices = np.array([])
     faces = []
     edges = dict()
-    bounds = []
+    bounds = dict()
 
     def __init__(self, another_mesh=None):
         if another_mesh is not None:
             self.vertices = np.copy(another_mesh.vertices)
             self.faces.extend(another_mesh.faces)
             self.edges.update(another_mesh.edges)
-            self.bounds.extend(another_mesh.bounds)
+            self.bounds.update(another_mesh.bounds)
 
     def load(self, obj_file_path):
         vertices = []
@@ -42,9 +42,9 @@ class Mesh:
                         bound_edges.pop(edge)
             for e in bound_edges:
                 if e[0] not in self.bounds:
-                    self.bounds.append(e[0])
+                    self.bounds[e[0]] = 1
                 if e[1] not in self.bounds:
-                    self.bounds.append(e[1])
+                    self.bounds[e[1]] = 1
         self.vertices = np.array(vertices)
         return self
 
@@ -60,5 +60,6 @@ class Mesh:
                 fp.write('v %f %f %f\n' % (v[0], v[1], v[2]))
             for f in np.array(self.faces) + 1:
                 fp.write('f %d %d %d\n' % (f[0], f[1], f[2]))
+        return self
 
 

@@ -1,5 +1,6 @@
 import numpy as np
 from app.smpl.smpl_tf import *
+from app.smpl.smpl_np import SMPLModel
 import os
 
 
@@ -39,6 +40,7 @@ def build_p0(betas, dir='.'):
 
         for f in faces + 1:
             fp.write('f %d %d %d\n' % (f[0], f[1], f[2]))
+
 
 
 if __name__ == '__main__':

@@ -3,6 +3,8 @@ from app.geometry.smooth import smooth
 import numpy as np
 import json
 
+ground_truth_dir = 'gt_files/'
+
 
 class BetaGroundTruth:
     # 17 * Vn * 3
@@ -27,6 +29,7 @@ class BetaGroundTruth:
         self.smooth_factor = smooth_times
 
     def load_objs(self, smooth_flag=True):
+        print('Begin load')
         betas = []
         beta_vertices = []
         beta_smooth_vertices = []
@@ -38,11 +41,13 @@ class BetaGroundTruth:
         if not smooth_flag:
             return self
         for i in range(self.beta_k):
-            beta_smooth_vertices.append(smooth(Mesh().load(self.beta_dir + str(i) + '.obj'), self.smooth_factor).vertices)
+            print('body: ', i)
+            beta_smooth_vertices.append(smooth(Mesh().load(self.beta_dir + str(i) + '.obj'), self.smooth_factor).save(self.avg_dir + '/smooth/' + str(i) + '.obj').vertices)
         self.beta_smooth_vertices = np.array(beta_smooth_vertices)
         return self
 
     def gen_avg(self, smooth_flag=True):
+        print('Begin gen')
         beta_avg = np.mean(self.beta_vertices, 0)
         beta_smooth_avg = np.mean(self.beta_smooth_vertices, 0)
         m = Mesh().load(self.beta_dir + '0.obj')
@@ -56,7 +61,16 @@ class BetaGroundTruth:
         m.save(self.avg_dir + 'avg_smooth.obj')
         return self
 
+    def gen_avg2(self):
+        print('Begin gen')
+        beta_smooth_avg = self.beta_smooth_vertices[0]
+        m = Mesh().load(self.beta_dir + '0.obj')
+        m.vertices = beta_smooth_avg
+        m.save(self.avg_dir + 'avg_smooth.obj')
+        return self
+
     def calc(self, smooth_flag=True):
+        print('Begin calc')
         self.beta_ground_truth['betas'] = self.betas.tolist()
         if smooth_flag:
             file = 'avg_smooth.obj'
@@ -82,8 +96,14 @@ class BetaGroundTruth:
         return self
 
 
-# BetaGroundTruth().load_objs().calc().save('beta_gt.json')
-beta_gt =  BetaGroundTruth().load('beta_gt.json')
+if __name__ == '__main__':
+    # 重新计算ground-truth，可修改保存位置
+    BetaGroundTruth(smooth_times=50).load_objs().gen_avg2().calc().save(ground_truth_dir + 'beta_gt.json')
+
+
+# 自动加载的ground-truth
+beta_gt = BetaGroundTruth().load(ground_truth_dir + 'beta_gt.json')
+
 
 # # 17 * Vn * 3
 # beta_ground_truth = {
@@ -121,5 +141,3 @@ beta_gt =  BetaGroundTruth().load('beta_gt.json')
 # print(np.shape(beta_vertices))
 
 
-if __name__ == '__main__':
-    pass
