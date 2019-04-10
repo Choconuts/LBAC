@@ -51,7 +51,7 @@ def add_layer(inputs, in_size, out_size, layer_name, activation_function=None, )
 # mlp全部全连接
 vertex_num = 17436
 learning_rate = 1e-4
-keep_probability = 0.2
+keep_probability = 0.8 # 0.2 is good
 batch_size = 128
 model_path = '../data/model/shape/test1.ckpt'
 

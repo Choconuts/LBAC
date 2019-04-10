@@ -1,5 +1,8 @@
 import numpy as np
 import pickle
+from app.geometry.mesh import Mesh
+
+smpl_model_path = '../data/model/smpl.pkl'
 
 
 class SMPLModel():
@@ -23,14 +26,14 @@ class SMPLModel():
             self.shapedirs = params['shapedirs']
             self.faces = params['f']
             self.kintree_table = params['kintree_table']
-            print("J_regressor\n", type(self.J_regressor))
-            print("posedirs\n", type(self.posedirs))
-            print("shapedirs\n", type(self.v_template))
-            print("shapedirs\n", type(self.shapedirs))
-            print("shapedirs\n", type(self.faces))
-            print("shapedirs\n", type(self.shapedirs))
-            print("shapedirs\n", type(self.kintree_table))
-            print("shapedirs\n", type(self.shapedirs))
+            # print("J_regressor\n", type(self.J_regressor))
+            # print("posedirs\n", type(self.posedirs))
+            # print("shapedirs\n", type(self.v_template))
+            # print("shapedirs\n", type(self.shapedirs))
+            # print("shapedirs\n", type(self.faces))
+            # print("shapedirs\n", type(self.shapedirs))
+            # print("shapedirs\n", type(self.kintree_table))
+            # print("shapedirs\n", type(self.shapedirs))
 
 
 
@@ -84,7 +87,7 @@ class SMPLModel():
         if trans is not None:
           self.trans = trans
         self.update()
-        return self.verts
+        return self.get_mesh()
 
     def update(self):
         """
@@ -218,8 +221,14 @@ class SMPLModel():
             for f in self.faces + 1:
                 fp.write('f %d %d %d\n' % (f[0], f[1], f[2]))
 
+    def get_mesh(self):
+        mesh = Mesh()
+        mesh.from_vertices(self.verts.tolist(), self.faces.tolist())
+        return mesh
 
-smpl = SMPLModel('./model.pkl')
+
+# smpl = SMPLModel('./model.pkl')
+smpl = SMPLModel(smpl_model_path)
 
 if __name__ == '__main__':
     np.random.seed(1212)

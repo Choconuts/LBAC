@@ -29,7 +29,21 @@ def avg_neighbors(vertices, edges, v, r):
     return s
 
 
-def smooth(mesh, times=1, level=1):
+def smooth(mesh, times=1, level=30):
+    """
+    taubin平滑
+    :param mesh: 需要平滑的网格
+    :param times: 平滑迭代的次数, 1~2次可以去噪声，5~10次可以去坑洞，40~50次可以去除布褶，建议不要超过60次
+    :param level: 平滑卷积的范围，通常是1不要修改
+    :return: 平滑网格
+    """
+    for i in range(times):
+        taubin(mesh, 0.8, i/level + 1)
+        taubin(mesh, -0.8, i/level + 1)
+    return mesh
+
+
+def smooth_laplacian(mesh, times=1, level=1):
     """
 
     :param mesh: 需要平滑的网格
@@ -60,7 +74,34 @@ def smooth(mesh, times=1, level=1):
     return mesh
 
 
+def expand(mesh, rate):
+    mesh.vertices *= rate
+
+
+def taubin(mesh, mu, level=1):
+    new_vertices = []
+    new_vertices.extend(mesh.vertices)
+    for v in mesh.edges:
+        neighbors = [v]
+        find_neighbors(mesh.edges, v, level, neighbors)
+        s = 0
+        ws = 0
+        for n in neighbors:
+            diff = mesh.vertices[n] - mesh.vertices[v]
+            w = 1
+            if n in mesh.bounds:
+                w = 10
+                if n == v:
+                    w = 50
+            s += diff * w
+            ws += w
+        if ws > 0:
+            new_vertices[v] = mesh.vertices[v] + mu * s / ws
+    mesh.vertices = np.array(new_vertices)
+
+
 if __name__ == '__main__':
-    m = Mesh().load('../data/beta_simulation/result/12.obj')
-    smooth(m, 50)
+    m = Mesh().load('../data/beta_simulation/result/1.obj')
+    smooth(m, 60)
+    # expand(m, 1.03)
     m.save('../test/save_mesh.obj')

@@ -31,5 +31,9 @@ class ShapeRegressor(Regressor):
 if __name__ == '__main__':
     rg = ShapeRegressor()
     beta = [1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
-    Mesh = smpl.set_params()
+    body = smpl.set_params(beta=beta)
+    print(0)
+    Mesh().load('../data/beta_simulation/avg_smooth.obj').save('../test/rebuild1.obj')
     smooth(rg.feed(beta).apply(Mesh().load('../data/beta_simulation/avg_smooth.obj')), 2).save('../test/rebuild1.obj')
+    print(1)
+    body.save('../test/rebuild1-body.obj')

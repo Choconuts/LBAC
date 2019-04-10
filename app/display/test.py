@@ -1,369 +1,169 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#! /usr/bin/env python
+'''Tests rendering using shader objects from core GL or extensions
 
-"""
-06-perpixel.py
+Uses the:
+    Lighthouse 3D Tutorial toon shader
+        http://www.lighthouse3d.com/opengl/glsl/index.php?toon2
 
-OpenGL 2.0 rendering using pixel and fragment shaders + per pixel lighting
-
-Copyright (c) 2010, Renaud Blanch <rndblnch at gmail dot com>
-Licence: GPLv3 or higher <http://www.gnu.org/licenses/gpl.html>
-"""
-
-# imports ####################################################################
-
-import sys
-
-from math import exp, modf
-from time import time
-from ctypes import sizeof, c_float, c_void_p, c_uint
-
-from OpenGL.GLUT import *
+By way of:
+    http://www.pygame.org/wiki/GLSLExample
+'''
+import OpenGL
+OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
-from app.display.objects import OBJ, obj
+from OpenGL.GLU import *
+from OpenGL.GLUT import *
+from app.display.objects import OBJ
+from app.geometry.mesh import Mesh
 
-import numpy as np
-from quaternion import *
-# from linalg import matrix as m
-# from numpy.linalg import quaternion as q
+# PyOpenGL 3.0.1 introduces this convenience module...
+from OpenGL.GL.shaders import *
 
-# import cube
+obj = Mesh().load('../test/save_mesh的副本 4.obj')
 
+import time, sys
+program = None
 
-# shader #####################################################################
-
-def create_shader(shader_type, source):
-    """compile a shader."""
-    shader = glCreateShader(shader_type)
-    glShaderSource(shader, source)
-    glCompileShader(shader)
-    if glGetShaderiv(shader, GL_COMPILE_STATUS) != GL_TRUE:
-        raise RuntimeError(glGetShaderInfoLog(shader))
-    return shader
-
-
-locations = {}
-uniforms = [b"lighting", b"texturing", b"texture_3d"]
-
-
-def init_program():
-    vert_shader = create_shader(GL_VERTEX_SHADER, """
-		uniform bool lighting;
-
-		varying vec3 N, L, S;
-
-		void main() {
-			gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-			gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
-
-			if(lighting) {
-				N = normalize(gl_NormalMatrix*gl_Normal.xyz);
-				L = normalize(gl_LightSource[0].position.xyz);
-				S = normalize(gl_LightSource[0].halfVector.xyz);
-			}
-			gl_FrontColor = gl_Color;
-		}
-	""")
-
-    frag_shader = create_shader(GL_FRAGMENT_SHADER, """
-		const float alpha_threshold = .55;
-
-		uniform bool texturing;
-		uniform sampler3D texture_3d;
-		uniform bool lighting;
-
-		varying vec3 N, L, S;
-
-		void main() {
-			if(texturing) {
-				vec4 texture_color = texture3D(texture_3d, gl_TexCoord[0].stp);
-				if(texture_color.a <= alpha_threshold)
-					discard;
-			}
-
-			vec4 color = gl_Color;
-			if(lighting) {
-				vec4 ambient = color * gl_LightModel.ambient;
-				vec4 diffuse = color * gl_LightSource[0].diffuse;
-				vec4 specular = gl_FrontMaterial.specular * gl_LightSource[0].specular;
-				float d = max(0., dot(N, L));
-				float s = pow(max(0., dot(N, S)), gl_FrontMaterial.shininess);
-				color = clamp(ambient + diffuse * d + specular * s, 0., 1.);
-			}
-			gl_FragColor = color;
-		}
-	""")
-
-    program = glCreateProgram()
-    glAttachShader(program, vert_shader)
-    glAttachShader(program, frag_shader)
-
-    glLinkProgram(program)
-    if glGetProgramiv(program, GL_LINK_STATUS) != GL_TRUE:
-        raise RuntimeError(glGetProgramInfoLog(program))
-
-    for uniform in uniforms:
-        locations[uniform] = glGetUniformLocation(program, uniform)
-
-    glUseProgram(program)
-
-
-# texture ####################################################################
-
-def init_texture():
-    glActiveTexture(GL_TEXTURE0 + 0)
-    glBindTexture(GL_TEXTURE_3D, glGenTextures(1))
-    glUniform1i(locations[b"texture_3d"], 0)
-
-    glTexParameter(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-    glTexParameter(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-
-    def pixel(i, j, k, opaque=b'\xff\xff\xff\xff',
-              transparent=b'\xff\xff\xff\x00'):
-        return opaque if (i + j + k) % 2 == 0 else transparent
-
-    width = height = depth = 2
-    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA,
-                 width, height, depth,
-                 0, GL_RGBA, GL_UNSIGNED_BYTE,
-                 b"".join(pixel(i, j, k) for i in range(width)
-                          for j in range(height)
-                          for k in range(depth)))
-
-
-def animate_texture(fps=25, period=10):
-    f, _ = modf(time() / period)
-
-    glMatrixMode(GL_TEXTURE)
-    glLoadIdentity()
-    glTranslate(f, f, f)
-    glRotate(f * 360, 1, 1, 1)
-    f = abs(f * 2 - 1)
-    glScale(1 + f, 1 + f, 1 + f)
-
-    glutPostRedisplay()
-    if texturing:
-        glutTimerFunc(int(1000 / fps), animate_texture, fps)
-
-
-# object #####################################################################
-
-def flatten(*lll):
-    return [u for ll in lll for l in ll for u in l]
-
-
-def init_object(model=obj):
-    # enabling arrays
-    glEnableClientState(GL_VERTEX_ARRAY)
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY)
-    glEnableClientState(GL_NORMAL_ARRAY)
-    glEnableClientState(GL_COLOR_ARRAY)
-
-    # model data
-    global sizes
-    sizes, indicies = 1, model.faces
-    data = flatten(*zip(model.vertices, model.texcoords,
-                        model.normals, model.faces))
-
-    # loading buffers
-    indices_buffer = (c_uint * len(indicies))(*indicies)
-    data_buffer = (c_float * len(data))(*data)
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glGenBuffers(1))
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_buffer, GL_STATIC_DRAW)
-
-    glBindBuffer(GL_ARRAY_BUFFER, glGenBuffers(1))
-    glBufferData(GL_ARRAY_BUFFER, data_buffer, GL_STATIC_DRAW)
-
-    del indices_buffer
-    del data_buffer
-
-
-uint_size = sizeof(c_uint)
-float_size = sizeof(c_float)
-vertex_offset = c_void_p(0 * float_size)
-tex_coord_offset = c_void_p(3 * float_size)
-normal_offset = c_void_p(6 * float_size)
-color_offset = c_void_p(9 * float_size)
-record_len = 12 * float_size
-
-
-def draw_object():
-    glVertexPointer(3, GL_FLOAT, record_len, vertex_offset)
-    glTexCoordPointer(3, GL_FLOAT, record_len, tex_coord_offset)
-    glNormalPointer(GL_FLOAT, record_len, normal_offset)
-    glColorPointer(3, GL_FLOAT, record_len, color_offset)
-
-    glMatrixMode(GL_MODELVIEW)
-    glPushMatrix()
-    glScale(scale, scale, scale)
-    glMultMatrixf(m.column_major(q.matrix(rotation)))
-
-    offset = 0
-    for size in sizes:
-        glDrawElements(GL_TRIANGLE_STRIP,
-                       size, GL_UNSIGNED_INT,
-                       c_void_p(offset))
-        offset += size * uint_size
-
-    glPopMatrix()
-
-
-# display ####################################################################
-
-def screen_shot(name="screen_shot.png"):
-    """window screenshot."""
-    width, height = glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)
-    data = glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE)
-
-    import png
-    png.write(open(name, "wb"), width, height, 3, data)
-
-
-def reshape(width, height):
-    """window reshape callback."""
-    glViewport(0, 0, width, height)
+# A general OpenGL initialization function.  Sets all of the initial parameters.
+def InitGL(Width, Height):                # We call this right after our OpenGL window is created.
+    glClearColor(0.0, 0.0, 0.0, 0.0)    # This Will Clear The Background Color To Black
+    glClearDepth(1.0)                    # Enables Clearing Of The Depth Buffer
+    glDepthFunc(GL_LESS)                # The Type Of Depth Test To Do
+    glEnable(GL_DEPTH_TEST)                # Enables Depth Testing
+    glShadeModel(GL_SMOOTH)                # Enables Smooth Color Shading
 
     glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    radius = .5 * min(width, height)
-    w, h = width / radius, height / radius
-    if perspective:
-        glFrustum(-w, w, -h, h, 8, 16)
-        glTranslate(0, 0, -12)
-        glScale(1.5, 1.5, 1.5)
-    else:
-        glOrtho(-w, w, -h, h, -2, 2)
+    glLoadIdentity()                    # Reset The Projection Matrix
+                                        # Calculate The Aspect Ratio Of The Window
+    gluPerspective(45.0, float(Width)/float(Height), 0.1, 100.0)
 
     glMatrixMode(GL_MODELVIEW)
+
+    if not glUseProgram:
+        print( 'Missing Shader Objects!' )
+        sys.exit(1)
+    global program
+    program = compileProgram(
+        compileShader('''
+            varying vec3 normal;
+            void main() {
+                normal = gl_NormalMatrix * gl_Normal;
+                gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+            }
+        ''',GL_VERTEX_SHADER),
+        compileShader('''
+            varying vec3 normal;
+            void main() {
+                float intensity;
+                vec4 color;
+                vec3 n = normalize(normal);
+                vec3 l = normalize(gl_LightSource[0].position).xyz;
+
+                // quantize to 5 steps (0, .25, .5, .75 and 1)
+                intensity = (floor(dot(l, n) * 4.0) + 1.0)/4.0;
+                color = vec4(1.0, intensity*0.5, intensity*0.5,
+                    intensity*1.0);
+
+                gl_FragColor = color;
+            }
+    ''',GL_FRAGMENT_SHADER),)
+
+
+# The function called when our window is resized (which shouldn't happen if you enable fullscreen, below)
+def ReSizeGLScene(Width, Height):
+    if Height == 0:                        # Prevent A Divide By Zero If The Window Is Too Small
+        Height = 1
+
+    glViewport(0, 0, Width, Height)        # Reset The Current Viewport And Perspective Transformation
+    glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
-
-
-def display():
-    """window redisplay callback."""
+    gluPerspective(45.0, float(Width)/float(Height), 0.1, 100.0)
+    glMatrixMode(GL_MODELVIEW)
+rot = 0
+# The main drawing function.
+def DrawGLScene():
+    # Clear The Screen And The Depth Buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    draw_object()
+    glLoadIdentity()                    # Reset The View
+
+    # Move Left 1.5 units and into the screen 6.0 units.
+    glTranslatef(-1.5, 0.0, -6.0)
+
+    if program:
+        glUseProgram(program)
+    # glutSolidSphere(1.0,32,32)
+    glTranslatef(1.5, 0.0, -2.0)
+    global rot
+    glScale(5, 5, 5)
+    glRotatef(rot, 0, 1, 0)
+    rot += 10
+    glBegin(GL_TRIANGLES)
+    for f in obj.faces:
+        for v in f:
+            vert = obj.vertices[v]
+            glVertex(vert[0], vert[1], vert[2])
+    glEnd()
+    # glutSolidCube( 1.0 )
+
+
+    #  since this is double buffered, swap the buffers to display what just got drawn.
     glutSwapBuffers()
 
+# The function called whenever a key is pressed. Note the use of Python tuples to pass in: (key, x, y)
+def keyPressed(*args):
+    # If escape is pressed, kill everything.
+    if args[0] == '\x1b':
+        sys.exit()
 
-# interaction ################################################################
+def main():
+    global window
+    # For now we just pass glutInit one empty argument. I wasn't sure what should or could be passed in (tuple, list, ...)
+    # Once I find out the right stuff based on reading the PyOpenGL source, I'll address this.
+    glutInit(sys.argv)
 
-PERSPECTIVE, LIGHTING, TEXTURING = b'p', b'l', b't'
-
-perspective = False
-lighting = False
-texturing = False
-
-
-def keyboard(c, x=0, y=0):
-    """keyboard callback."""
-    global perspective, lighting, texturing
-
-    if c == PERSPECTIVE:
-        perspective = not perspective
-        reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT))
-
-    elif c == LIGHTING:
-        lighting = not lighting
-        glUniform1i(locations[b"lighting"], lighting)
-
-    elif c == TEXTURING:
-        texturing = not texturing
-        glUniform1i(locations[b"texturing"], texturing)
-        if texturing:
-            animate_texture()
-
-    elif c == b's':
-        screen_shot()
-
-    elif c == b'q':
-        sys.exit(0)
-    glutPostRedisplay()
-
-
-rotating = False
-scaling = False
-
-rotation = quaternion()
-scale = 1.
-
-
-def screen2space(x, y):
-    width, height = glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)
-    radius = min(width, height) * scale
-    return (2. * x - width) / radius, -(2. * y - height) / radius
-
-
-def mouse(button, state, x, y):
-    global rotating, scaling, x0, y0
-    if button == GLUT_LEFT_BUTTON:
-        rotating = (state == GLUT_DOWN)
-    elif button == GLUT_RIGHT_BUTTON:
-        scaling = (state == GLUT_DOWN)
-    x0, y0 = x, y
-
-
-def motion(x1, y1):
-    global x0, y0, rotation, scale
-    if rotating:
-        p0 = screen2space(x0, y0)
-        p1 = screen2space(x1, y1)
-        rotation = q.product(rotation, q.arcball(*p0), q.arcball(*p1))
-    if scaling:
-        scale *= exp(((x1 - x0) - (y1 - y0)) * .01)
-    x0, y0 = x1, y1
-    glutPostRedisplay()
-
-
-# setup ######################################################################
-
-WINDOW_SIZE = 640, 480
-
-
-def init_glut(argv):
-    """glut initialization."""
-    glutInit(argv)
-    glutInitWindowSize(*WINDOW_SIZE)
+    # Select type of Display mode:
+    #  Double buffer
+    #  RGBA color
+    # Alpha components supported
+    # Depth buffer
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
 
-    glutCreateWindow(argv[0].encode())
+    # get a 640 x 480 window
+    glutInitWindowSize(640, 480)
 
-    glutReshapeFunc(reshape)
-    glutDisplayFunc(display)
-    glutKeyboardFunc(keyboard)
-    glutMouseFunc(mouse)
-    glutMotionFunc(motion)
+    # the window starts at the upper left corner of the screen
+    glutInitWindowPosition(0, 0)
 
+    # Okay, like the C version we retain the window id to use when closing, but for those of you new
+    # to Python (like myself), remember this assignment would make the variable local and not global
+    # if it weren't for the global declaration at the start of main.
+    window = glutCreateWindow("Jeff Molofee's GL Code Tutorial ... NeHe '99")
 
-def init_opengl():
-    # depth test
-    glEnable(GL_DEPTH_TEST)
-    glDepthFunc(GL_LEQUAL)
+       # Register the drawing function with glut, BUT in Python land, at least using PyOpenGL, we need to
+    # set the function pointer and invoke a function to actually register the callback, otherwise it
+    # would be very much like the C version of the code.
+    glutDisplayFunc(DrawGLScene)
 
-    # lighting
-    light_position = [1., 1., 2., 0.]
-    glLight(GL_LIGHT0, GL_POSITION, light_position)
-    glMaterialfv(GL_FRONT, GL_SPECULAR, [1., 1., 1., 1.])
-    glMaterialf(GL_FRONT, GL_SHININESS, 100.)
+    # Uncomment this line to get full screen.
+    #glutFullScreen()
 
-    # initial state
-    for k in [PERSPECTIVE, LIGHTING, TEXTURING]:
-        keyboard(k)
+    # When we are doing nothing, redraw the scene.
+    glutIdleFunc(DrawGLScene)
 
+    # Register the function called when our window is resized.
+    glutReshapeFunc(ReSizeGLScene)
 
-# main #######################################################################
+    # Register the function called when the keyboard is pressed.
+    glutKeyboardFunc(keyPressed)
 
-def main(argv=None):
-    if argv is None:
-        argv = sys.argv
+    # Initialize our window.
+    InitGL(640, 480)
 
-    init_glut(argv)
-    init_program()
-    init_texture()
-    init_opengl()
-    init_object()
-    return glutMainLoop()
+    # Start Event Processing Engine
+    glutMainLoop()
 
+# Print message to console, and kick off the main to get it rolling.
 
 if __name__ == "__main__":
-    sys.exit(main())
+    print( "Hit ESC key to quit." )
+    main()

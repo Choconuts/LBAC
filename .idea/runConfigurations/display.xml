@@ -5,7 +5,7 @@
     <option name="PARENT_ENVS" value="true" />
     <envs>
       <env name="PYTHONUNBUFFERED" value="1" />
-      <env name="DISPLAY" value="/private/tmp/com.apple.launchd.UDwvlQxl7a/org.macosforge.xquartz:0" />
+      <env name="DISPLAY" value="/private/tmp/com.apple.launchd.M5X9YkOfVM/org.macosforge.xquartz:0" />
     </envs>
     <option name="SDK_HOME" value="" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/app" />

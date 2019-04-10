@@ -1,6 +1,7 @@
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
+import numpy as np
 
 
 class OBJ:
@@ -34,7 +35,7 @@ class OBJ:
                 v = [float(x) for x in values[1:3]]
 
                 self.texcoords.append(v)
-            elif values[0] in ('usemtl', 'usemat'):
+            elif values[0] in ('usemtl', 'usemat') and len(values) > 1:
                 material = values[1]
             elif values[0] == 'mtllib':
                 #print(values[1])

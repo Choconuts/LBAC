@@ -2,10 +2,9 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from app.display.camera import Camera
-from app.display.objects import OBJ, obj
-from app.display.shader import *
+from app.display.objects import OBJ
 
-
+obj = OBJ('./test/', 'save_mesh的副本 4.obj')
 
 class Display:
 
@@ -20,7 +19,7 @@ class Display:
 def drawFunc():
     glClear(GL_COLOR_BUFFER_BIT)
     glRotatef(1, 0, 1, 0)
-    glutWireTeapot(0.5)
+    glutWireTeapot(1.5)
     glFlush()
 
 
@@ -41,15 +40,15 @@ camera = Camera()
 
 def InitGL(width, height):
     glClearColor(0.1, 0.1, 0.5, 0.1)
-    glClearDepth(1.0)
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+    glClearDepth(10.0)
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
     gluPerspective(45.0, float(width) / float(height), 0.1, 100.0)
     camera.move(0.0, 0.0, -5)
     obj.create_gl_list()
 
-    shader_init()
+    # shader_init()
 
 
 def DrawGLScene():
@@ -58,11 +57,12 @@ def DrawGLScene():
     camera.setLookat()
     # drawFunc()
     glPushMatrix()
-    glScale(1.5, 1.5, 1.5)
+    glScale(5, 5, 5)
+    glColor(0.5, 0.5, 0.5)
     glCallList(obj.gl_list)
     glPopMatrix()
 
-    shader_test()
+    # shader_test()
     glutSwapBuffers()
 
 
