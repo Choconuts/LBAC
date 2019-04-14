@@ -17,6 +17,7 @@ class Mesh:
             self.faces = []
             self.edges = dict()
             self.bounds = dict()
+        self.update()
 
     def load(self, obj_file_path):
         vertices = []
@@ -48,6 +49,7 @@ class Mesh:
                 if e[1] not in self.bounds:
                     self.bounds[e[1]] = 1
         self.vertices = np.array(vertices)
+        self.update()
         return self
 
     def from_vertices(self, vertices, faces):
@@ -70,6 +72,7 @@ class Mesh:
             if e[1] not in self.bounds:
                 self.bounds[e[1]] = 1
         self.vertices = np.array(vertices)
+        self.update()
         return self
 
     def add_edge(self, a, b):
@@ -90,7 +93,41 @@ class Mesh:
         buffer = []
         for face in self.faces:
             triangle = []
+            norm = self.face_norm(face)
             for v in face:
-                triangle.append(self.vertices[v])
-            buffer.append(triangle)
-        return np.array(buffer)
+                triangle.extend(self.vertices[v].tolist())
+                # triangle.extend(norm.tolist())
+                triangle.extend(self.normal[v])
+            buffer.extend(triangle)
+        return np.array(buffer, dtype="float32")
+
+    def face_norm(self, face):
+
+        def get(i):
+            return self.vertices[face[i]] - self.vertices[face[i - 1]]
+
+        return np.cross(get(1), get(2))
+
+    def compute_vertex_normal(self):
+        v_f = dict()
+        for f in self.faces:
+            fn = self.face_norm(f)
+            for v in f:
+                if v not in v_f:
+                    v_f[v] = 0
+                v_f[v] += fn
+        for v in v_f:
+            v_f[v] /= len(v_f[v])
+        self.normal = v_f
+
+    def update(self):
+        self.compute_vertex_normal()
+
+
+
+def calc_normal(v1, v2, v3):
+    return np.cross(v2 - v1, v3 - v2)
+
+
+if __name__ == '__main__':
+    verts = Mesh().load('./../test/anima/seq1/1.obj').compute_vertex_normal()

@@ -24,5 +24,18 @@ def find_all_files(base_dir, pattern):
     return targets
 
 
+def parse_joints(info_file):
+    """
+
+    :param info_file:
+    :return: 100 * 24 * 3
+    """
+    mat = sio.loadmat(info_file)
+    joints = np.transpose(mat.get('joints3D'))
+    return joints
+
+
 if __name__ == '__main__':
-    find_all_files('..', 'info.mat')
+    f = find_all_files('..', 'info.mat')
+    j = parse_joints(f[0])
+    print(j[10])

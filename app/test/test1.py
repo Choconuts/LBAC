@@ -1,5 +1,6 @@
 import re
 import numpy as np
+from scipy import interpolate
 import json
 
 meta = {
@@ -22,6 +23,20 @@ def meta_file():
         json.dump(meta, fp)
 
 
+xp = [1, 2, 3]
+fp = [3, 2, 0]
+
+x = [0, 1, 2, 3, 4, 5]
+
+# interpolate.interp2d(x, y, fvals, kind='cubic')
+
+b1 = [0, 0, 0, 0]
+b2 = [2, 3, 4, 5]
+r = []
+for i in range(len(b1)):
+    r.append(np.linspace(b1[i], b2[i], 10))
+r = np.transpose(r)
+print(r)
 
 if __name__ == '__main__':
     pass

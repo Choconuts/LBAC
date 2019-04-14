@@ -28,7 +28,10 @@ def full_conn_layer(input_layer, output_size, activate=tf.nn.relu):
     b_fc = tf.Variable(tf.constant(0.01, shape=[output_size]))   # 偏置
     d_fc = tf.matmul(input_layer, w_fc) + b_fc
     d_fc = tf.nn.dropout(d_fc, keep_prob)
-    h_fc = activate(d_fc)        # 激活函数
+    if activate != None:
+        h_fc = activate(d_fc)        # 激活函数
+    else:
+        h_fc = d_fc
     h_fc = tf.nn.dropout(h_fc, keep_prob)
     return h_fc
 
@@ -63,7 +66,7 @@ y_true = tf.placeholder(tf.float32, shape=[None, vertex_num * 3], name="displace
 # 第1、2、3层: 全连接
 full1 = full_conn_layer(x, 20)
 full2 = full1 # full_conn_layer(full1, 500)
-full3 = full_conn_layer(full2, vertex_num * 3)
+full3 = full_conn_layer(full2, vertex_num * 3, None)
 
 # 损失优化、评估准确率
 cross_entropy = tf.reduce_mean(tf.square(y_true - full3), 1)
@@ -92,14 +95,14 @@ def train():
     writer.close()
 
 
-def test():
-    global disp
-    with tf.Session() as sess:
-        saver = tf.train.Saver()
-        saver.restore(sess, model_path)
-        disp = sess.run(full3, feed_dict={x: [[1.2, 0.3, 2.3, 1.2, -2.1, 0, 2.3, 0, 0, 0]], keep_prob: 1})
-        # disp = beta_gt.displacement[1]
-        np.reshape(beta_gt.displacement[5], (vertex_num, 3))
+# def test():
+#     global disp
+#     with tf.Session() as sess:
+#         saver = tf.train.Saver()
+#         saver.restore(sess, model_path)
+#         disp = sess.run(full3, feed_dict={x: [[1.2, 0.3, 2.3, 1.2, -2.1, 0, 2.3, 0, 0, 0]], keep_prob: 1})
+#         # disp = beta_gt.displacement[1]
+#         np.reshape(beta_gt.displacement[5], (vertex_num, 3))
 
 
 def predict(sess, betas):
