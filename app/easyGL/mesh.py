@@ -197,14 +197,19 @@ class Mesh:
 
     def compute_vertex_normal(self):
         v_f = dict()
+        self.vertex_face_map = dict()
+        i = 0
         for f in self.faces:
             fn = self.face_norm(f)
             for v in f:
                 if v not in v_f:
+                    self.vertex_face_map[v] = []
                     v_f[v] = 0
+                self.vertex_face_map[v].append(i)
                 v_f[v] += fn
+            i += 1
         for v in v_f:
-            v_f[v] /= len(v_f[v])
+            v_f[v] /= np.linalg.norm(v_f[v])
         self.normal = v_f
 
     def update(self):
@@ -234,4 +239,5 @@ class VertexArray:
 
 
 if __name__ == '__main__':
-    verts = Mesh().load('./../test/anima/seq1/1.obj').compute_vertex_normal()
+    Mesh().load('./../test/anima/seq1/1.obj').compute_vertex_normal()
+

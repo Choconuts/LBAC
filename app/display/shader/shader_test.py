@@ -8,7 +8,7 @@ from app.display.shader.shaders import SimpleShader
 from app.display.vbo import StaticVBO
 from app.display.simple_display import VertexArray
 
-obj = Mesh().load('../test/save_mesh的副本 4.obj')
+obj = Mesh().load('../../test/save_mesh的副本 4.obj')
 
 gpgpu_v = """
         //#version 330 compatibility
@@ -195,6 +195,7 @@ def tes_draw():
     glScale(1.5, 1.5, 1.5)
     glRotatef(rot, 0, 1, 0)
     rot += 1
+    rot %= 360
     glBindBuffer(GL_ARRAY_BUFFER, vbo2.id)
     glDrawArrays(GL_TRIANGLES, 0, int(vbo2.num / 7))
     # glBindBuffer(GL_ARRAY_BUFFER, vbo3.id)
@@ -226,9 +227,9 @@ def main():
     #                    0.0, -1.0, 0.0, 0.5, 0, -0.5,
     #                    0.5, 0.0, 1.0, 0.5, 0, -0.5
     #                    ], dtype="float32"))
-    verts = Mesh().load('./../test/anima/seq1/1.obj').to_vertex_buffer() # './../smpl/17-bodies/1.obj'
+    verts = Mesh().load('../../test/anima/seq1/1.obj').to_vertex_buffer() # './../smpl/17-bodies/1.obj'
     verts = VertexArray(verts).add_cols([1]).get()
-    verts2 = Mesh().load('./../smpl/17-bodies/1.obj').to_vertex_buffer()
+    verts2 = Mesh().load('../../smpl/17-bodies/1.obj').to_vertex_buffer()
     verts2 = VertexArray(verts2).add_cols([0]).get()
 
     glutCreateWindow("sanjiao")  # 创建窗口
@@ -242,9 +243,6 @@ def main():
     glClearColor(0.0, 0.0, 0.0, 0.0)
     glutMainLoop()
 
-
-def init_shader():
-    pass
 
 if __name__ == '__main__':
      main()

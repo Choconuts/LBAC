@@ -50,44 +50,49 @@ def add_layer(inputs, in_size, out_size, layer_name, activation_function=None, )
     tf.histogram_summary(layer_name + '/outputs', outputs)
     return outputs
 
-
 # mlp全部全连接
-vertex_num = 17436
+vertex_num = 7366 #17436
 learning_rate = 1e-4
 keep_probability = 0.8 # 0.2 is good
 batch_size = 128
-model_path = '../data/model/shape/test1.ckpt'
+model_path = '../data/model/shape/test2.ckpt'
 
-# 数据输入占位符
-keep_prob = tf.placeholder(tf.float32)
-x = tf.placeholder(tf.float32, shape=[None, 10], name="betas")
-y_true = tf.placeholder(tf.float32, shape=[None, vertex_num * 3], name="displacements")
 
-# 第1、2、3层: 全连接
-full1 = full_conn_layer(x, 20)
-full2 = full1 # full_conn_layer(full1, 500)
-full3 = full_conn_layer(full2, vertex_num * 3, None)
+def shape_graph():
+    global keep_prob, x_shape_input, y_shape_true, shape_final_full, shape_cross_entropy, shape_train_step, shape_accuracy
 
-# 损失优化、评估准确率
-cross_entropy = tf.reduce_mean(tf.square(y_true - full3), 1)
-train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy)
-correct_prediction = tf.reduce_mean(tf.square(y_true - full3), 1)
-accuracy = tf.reduce_mean(tf.cast(correct_prediction, 'float'))
+    # 数据输入占位符
+    keep_prob = tf.placeholder(tf.float32)
+    x_shape_input = tf.placeholder(tf.float32, shape=[None, 10], name="betas")
+    y_shape_true = tf.placeholder(tf.float32, shape=[None, vertex_num * 3], name="displacements")
+
+    # 第1、2、3层: 全连接
+    full1 = full_conn_layer(x_shape_input, 20)
+    full2 = full1 # full_conn_layer(full1, 500)
+    shape_final_full = full_conn_layer(full2, vertex_num * 3, None)
+
+    # 损失优化、评估准确率
+    shape_cross_entropy = tf.reduce_mean(tf.square(y_shape_true - shape_final_full), 1)
+    shape_train_step = tf.train.AdamOptimizer(learning_rate).minimize(shape_cross_entropy)
+    correct_prediction = tf.reduce_mean(tf.square(y_shape_true - shape_final_full), 1)
+    shape_accuracy = tf.reduce_mean(tf.cast(correct_prediction, 'float'))
+
 
 
 def train():
+
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         test_y = np.reshape(beta_gt.displacement[0:1], (-1, vertex_num * 3))
         for i in range(10000):
             batch = [beta_gt.betas[0:17], np.reshape(beta_gt.displacement[0:17], (-1, vertex_num * 3))]
             if i % 10 == 0:
-                train_accuracy = accuracy.eval(session=sess, feed_dict={x: batch[0], y_true: batch[1], keep_prob: 1})
+                train_accuracy = shape_accuracy.eval(session=sess, feed_dict={x_shape_input: batch[0], y_shape_true: batch[1], keep_prob: 1})
                 print('step {}, training accuracy: {}'.format(i, train_accuracy))
-            train_step.run(session=sess, feed_dict={x: batch[0], y_true: batch[1],  keep_prob: keep_probability})
-        print('test accuracy: {}'.format(accuracy.eval(
+            shape_train_step.run(session=sess, feed_dict={x_shape_input: batch[0], y_shape_true: batch[1], keep_prob: keep_probability})
+        print('test accuracy: {}'.format(shape_accuracy.eval(
             session=sess,
-            feed_dict={x: beta_gt.betas[0:1], y_true: test_y, keep_prob: 1})))
+            feed_dict={x_shape_input: beta_gt.betas[0:1], y_shape_true: test_y, keep_prob: 1})))
         saver = tf.train.Saver()
         saver.save(sess, model_path)
 
@@ -95,25 +100,12 @@ def train():
     writer.close()
 
 
-# def test():
-#     global disp
-#     with tf.Session() as sess:
-#         saver = tf.train.Saver()
-#         saver.restore(sess, model_path)
-#         disp = sess.run(full3, feed_dict={x: [[1.2, 0.3, 2.3, 1.2, -2.1, 0, 2.3, 0, 0, 0]], keep_prob: 1})
-#         # disp = beta_gt.displacement[1]
-#         np.reshape(beta_gt.displacement[5], (vertex_num, 3))
-
-
 def predict(sess, betas):
-    return sess.run(full3, feed_dict={x: [betas], keep_prob: 1})
+    return sess.run(shape_final_full, feed_dict={x_shape_input: [betas], keep_prob: 1})
 
-
-disp = 0
-# train()
-# test()
 
 if __name__ == '__main__':
-    pass
+    shape_graph()
+    train()
 
 # python /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/tensorboard/tensorboard.py --logdir=logfile

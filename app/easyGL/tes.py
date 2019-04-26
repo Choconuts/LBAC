@@ -5,7 +5,7 @@ import  numpy as np
 from app.easyGL.mesh import *
 from app.easyGL.shader import *
 
-
+rot = 0
 def tes_draw():
     global rot
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -31,7 +31,7 @@ def main():
     glutInitWindowSize(500, 500)  # 窗口大小
     glutInitContextVersion(4,3)   #为了兼容
     glutInitContextProfile(GLUT_CORE_PROFILE)   #为了兼容
-    global vbo2, vbo3
+    global vbo2
     verts = Mesh().load('./../test/anima/seq1/1.obj').to_vertex_buffer() # './../smpl/17-bodies/1.obj'
     verts = VertexArray(verts).add_cols([1]).get()
     verts2 = Mesh().load('./../smpl/17-bodies/1.obj').to_vertex_buffer()
@@ -41,7 +41,7 @@ def main():
     glutDisplayFunc(tes_draw)  # 回调函数
     glutIdleFunc(tes_draw)  # 回调函数
 
-    vbo2 = StaticVBO().bind(np.hstack((verts, verts2)))
+    vbo2 = StaticVBO().bind(np.hstack((verts2, verts)))
     global shader
     shader = SimpleShader().color(0, [1, 0, 0])
     glEnable(GL_DEPTH_TEST)

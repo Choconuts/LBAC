@@ -2,6 +2,7 @@ import re
 import numpy as np
 from scipy import interpolate
 import json
+from pyoctree import pyoctree as ot
 
 meta = {
     0: [0, 0, 0, 0, 0,  0, 0, 0, 0, 0],
@@ -22,21 +23,40 @@ def meta_file():
     with open('betas.json', 'w') as fp:
         json.dump(meta, fp)
 
+vts = []
+for i in [-1, 1]:
+    for j in [-1, 1]:
+        for k in [-1, 1]:
+            vts.append([i, j, k])
+for i in [-1, 1]:
+    for j in [-1, 1]:
+        for k in [-1, 1]:
+            vts.append([i * 0.5, j * 0.5, k * 0.5])
+for i in [-1, 1]:
+    for j in [-1, 1]:
+        for k in [-1, 1]:
+            vts.append([i * 4, j * 0.5, k * 0.5])
+for i in [-1, 1]:
+    for j in [-1, 1]:
+        for k in [-1, 1]:
+            vts.append([i * 0.5, j * 0.8, k * 5])
+print(vts)
+vts = np.array(vts, np.float)
 
-xp = [1, 2, 3]
-fp = [3, 2, 0]
+fcs = []
+for i in range(30):
+    fcs.append([i, i, i])
+for i in range(16):
+    fcs.append([i, i, i])
+for i in range(30):
+    fcs.append([i, i, i])
+for i in range(16):
+    fcs.append([i, i, i])
 
-x = [0, 1, 2, 3, 4, 5]
+oct =  ot.PyOctree(vts, np.array(fcs, np.int32))
 
-# interpolate.interp2d(x, y, fvals, kind='cubic')
-
-b1 = [0, 0, 0, 0]
-b2 = [2, 3, 4, 5]
-r = []
-for i in range(len(b1)):
-    r.append(np.linspace(b1[i], b2[i], 10))
-r = np.transpose(r)
-print(r)
+print(oct.root)
+print(oct.root.branches)
 
 if __name__ == '__main__':
     pass

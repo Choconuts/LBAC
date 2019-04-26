@@ -26,6 +26,7 @@ class SMPLModel():
             self.shapedirs = params['shapedirs']
             self.faces = params['f']
             self.kintree_table = params['kintree_table']
+            self.G = np.array([])
             # print("J_regressor\n", type(self.J_regressor))
             # print("posedirs\n", type(self.posedirs))
             # print("shapedirs\n", type(self.v_template))
@@ -129,6 +130,7 @@ class SMPLModel():
                 np.hstack([self.J, np.zeros([24, 1])]).reshape([24, 4, 1])
                 )
             )
+        self.G = G
         # transformation of each vertex
         T = np.tensordot(self.weights, G, axes=[[1], [0]])
         # T (6890, 4, 4)

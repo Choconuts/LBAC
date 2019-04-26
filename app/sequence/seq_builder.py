@@ -51,7 +51,7 @@ def shape_sequences(shapes, frame=5):
         seq_dir = os.path.join(base_dir, 'seq_' + str(i))
         build_sequence(seq_dir, betas)
         index.append(seq_dir)
-    with open(os.path.join(base_dir + 'index.json'), 'w') as fp:
+    with open(os.path.join(base_dir, 'index.json'), 'w') as fp:
         json.dump(index, fp)
 
 
@@ -66,9 +66,16 @@ def build_17_betas_sequence():
     shape_sequences(betas)
 
 
-def build_56_poses_sequence():
+def build_56_poses_sequence(info_dir):
     pass
 
 
+
+
+
+
 if __name__ == '__main__':
-    build_17_betas_sequence()
+    """
+    a
+    """
+    # build_17_betas_sequence()

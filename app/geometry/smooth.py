@@ -37,9 +37,10 @@ def smooth(mesh, times=1, level=30):
     :param level: 平滑卷积的范围，通常是1不要修改
     :return: 平滑网格
     """
-    for i in range(times):
-        taubin(mesh, 0.8, i/level + 1)
-        taubin(mesh, -0.8, i/level + 1)
+    # for i in range(times):
+    #     taubin(mesh, 0.8, 1)
+    #     taubin(mesh, -0.8, 1)
+    smooth_hcl(mesh, times)
     return mesh
 
 
@@ -100,8 +101,59 @@ def taubin(mesh, mu, level=1):
     mesh.vertices = np.array(new_vertices)
 
 
+def get_weight_hcl(origin, mesh, n, v):
+    w = 1
+    if n in mesh.bounds:
+        w = 10
+        if n == v:
+            w = 50
+    return w
+
+
+def push_back_vertex(origin, mesh, mu):
+    for v in range(len(mesh.vertices)):
+        w = 1 - mu
+        mesh.vertices[v] = mesh.vertices[v] * w + origin.vertices[v] * (1 - w)
+
+
+def smooth_hcl(mesh, times):
+    origin = Mesh(mesh)
+    for i in range(times):
+        taubin(mesh, 1, 1)
+        push_back_vertex(origin, mesh, 0.2)
+        taubin(mesh, -0.2, 1)
+    return mesh
+
+
 if __name__ == '__main__':
-    m = Mesh().load('../data/beta_simulation/result/1.obj')
-    smooth(m, 60)
+    # m = Mesh().load('../data/beta_simulation/result/1.obj')
+    m = Mesh().load('../data/pose_simulation/tst/shape_y_final/5.obj')
+    smooth_hcl(m, 50)
     # expand(m, 1.03)
     m.save('../test/save_mesh.obj')
+
+
+def smooth_bounds(mesh, times):
+    def taubin(mesh, mu, level=1):
+        new_vertices = []
+        new_vertices.extend(mesh.vertices)
+        for v in mesh.bounds:
+            neighbors = [v]
+            find_neighbors(mesh.edges, v, level, neighbors)
+            s = 0
+            ws = 0
+            for n in neighbors:
+                diff = mesh.vertices[n] - mesh.vertices[v]
+                w = 0
+                if n in mesh.bounds:
+                    w = 10
+                    if n == v:
+                        w = 30
+                s += diff * w
+                ws += w
+            if ws > 0:
+                new_vertices[v] = mesh.vertices[v] + mu * s / ws
+        mesh.vertices = np.array(new_vertices)
+
+    for i in range(times):
+        taubin(mesh, 0.5)
