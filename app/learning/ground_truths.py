@@ -277,7 +277,9 @@ class PoseGroundTruth:
 
 
 if __name__ == '__main__':
-    PoseGroundTruth().gen_truth('../data/pose_simulation/tst/').save(ground_truth_dir + 'pose_gt_4.json')
+    """
+    """
+    # PoseGroundTruth().gen_truth('../data/pose_simulation/tst/').save(ground_truth_dir + 'pose_gt_4.json')
 
 pose_gt = PoseGroundTruth().load(ground_truth_dir + 'pose_gt_4.json')
 

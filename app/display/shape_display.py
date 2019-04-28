@@ -34,7 +34,7 @@ def apply_pose(cloth, body, pose, rela):
 
 impact = []
 
-def post_processing(cloth, body, rela):
+def post_processing(cloth, body, rela, tst=False):
     import math
 
     def get_closest_face(i):
@@ -64,15 +64,34 @@ def post_processing(cloth, body, rela):
     global impact
     impact = []
 
+    def spread(ci, vec, levels=40):
+        past = {}
+        bias = 0.06
+
+        def get_vec(i, level):
+            return vec * bias / (np.linalg.norm(cloth.vertices[i] - cloth.vertices[ci]) + bias)
+            # return vec * level / tot_level
+
+        def forward(i, level):
+            if level == 0 or i in past:
+                return
+            past[i] = 1
+            cloth.vertices[i] += get_vec(i, level)
+            for ni in cloth.edges[i]:
+                forward(ni, level - 1)
+
+        forward(ci, levels)
+
     for i in range(len(cloth.vertices)):
         # d, n, f = get_closest_face(i)
         vc = cloth.vertices[i]
         vb = body.vertices[rela[i]]
         bn = body.normal[rela[i]]
+        cn = cloth.normal[i]
         if np.dot(vb - vc, bn) > 0:
-            cloth.vertices[i] += bn * 0.015
-        else:
-            cloth.vertices[i] += bn * 0.01
+            spread(i, bn * np.dot(vb - vc, bn) * 1.2)
+        cloth.vertices[i] += cn * 0.006
+
 
     return cloth
 
@@ -81,7 +100,7 @@ def draw(cloth, body):
     glutInit([])
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH)  # 显示模式 双缓存
     glutInitWindowPosition(100, 100)  # 窗口位置
-    glutInitWindowSize(500, 500)  # 窗口大小
+    glutInitWindowSize(800, 800)  # 窗口大小
     glutInitContextVersion(4, 3)  # 为了兼容
     glutInitContextProfile(GLUT_CORE_PROFILE)  # 为了兼容
 
@@ -332,7 +351,7 @@ class VertexRelation:
 global timer
 
 if __name__ == '__main__':
-    shape = [2,-2,2,0,0,0,0,0,0,0]
+    shape = beta_gt.betas[3]
     pose = [[0, 0, 0]]
     for i in range(23):
         pose.append([-0.1, -0.2, 0.1])
@@ -344,10 +363,18 @@ if __name__ == '__main__':
     vertex_rela = VertexRelation().load('shape/test_rela.json')
     rela = vertex_rela.get_rela()
     body_posed = get_body(shape, pose)
-    apply_pose(cloth, body, pose, rela)
-    rela = vertex_rela.update(cloth, body_posed).get_rela()
-    post_processing(cloth, body_posed, rela)
-    from app.geometry.smooth import smooth_bounds
-    smooth_bounds(cloth, 5)
-    draw(get_cloth(shape), body_posed)
+    # apply_pose(cloth, body, pose, rela)
+    # rela = vertex_rela.update(cloth, body_posed).get_rela()
+    rela = vertex_rela.update(cloth, body).get_rela()
+    post_processing(cloth, body, rela)
+    # post_processing(cloth, body, rela, True)
+    # from app.geometry.smooth import smooth_bounds
+    # smooth_bounds(cloth, 10)
+    smooth(cloth, 2)
+
+    # saved_cloth = Mesh().load('../test/save_mesh.obj')
+    cloth.update()
+    cloth.save('shape/cloth.obj')
+    draw(cloth, body)
+    # draw(saved_cloth, body)
 

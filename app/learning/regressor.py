@@ -31,6 +31,7 @@ class ShapeRegressor(Regressor):
         return self
 
 
+
 class PoseRegressor(Regressor):
     def __init__(self, model_file=pose_model_path):
         self.model_path = model_file
@@ -46,12 +47,20 @@ class PoseRegressor(Regressor):
 
 if __name__ == '__main__':
     rg = ShapeRegressor()
-    pr = PoseRegressor()
-    beta = [1, -1, 1, 0, 0, 0, 0, 0, 0, 0]
-    pose = np.zeros((24, 3))
-    body = smpl.set_params(beta=beta)
-    print(0)
+    # pr = PoseRegressor()
+    idx = 5
+    beta = beta_gt.betas[idx]
+    # pose = np.zeros((24, 3))
+    # body = smpl.set_params(beta=beta)
+    # print(0)
     rg.feed(beta).apply(beta_gt.template).save('../test/rebuild2.obj')
-    pr.feed(pose).apply(beta_gt.template).save('../test/rebuild_pose1.obj')
-    print(1)
-    body.save('../test/rebuild2-body.obj')
+    print(rg.displacement)
+    print(beta_gt.displacement[idx])
+    cost = np.mean(np.square(rg.displacement - beta_gt.displacement[idx]))
+    print(cost)
+    # pr.feed(pose).apply(beta_gt.template).save('../test/rebuild_pose1.obj')
+    # print(1)
+    # body.save('../test/rebuild2-body.obj')
+    # rg.displacement = beta_gt.displacement[5]
+    # cloth = rg.apply(beta_gt.template)
+    # cloth.save('../test/beta_gt_cloth_5.obj')

@@ -156,4 +156,4 @@ def smooth_bounds(mesh, times):
         mesh.vertices = np.array(new_vertices)
 
     for i in range(times):
-        taubin(mesh, 0.5)
+        taubin(mesh, 1)

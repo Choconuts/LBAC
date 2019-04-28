@@ -3,6 +3,7 @@ import re
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
+import copy
 
 
 class OBJ:
@@ -96,9 +97,9 @@ class Mesh:
     def __init__(self, another_mesh=None):
         if another_mesh is not None:
             self.vertices = np.copy(another_mesh.vertices)
-            self.faces.extend(another_mesh.faces)
-            self.edges.update(another_mesh.edges)
-            self.bounds.update(another_mesh.bounds)
+            self.faces = copy.deepcopy(another_mesh.faces)
+            self.edges = copy.deepcopy(another_mesh.edges)
+            self.bounds = copy.deepcopy(another_mesh.bounds)
         else:
             self.vertices = np.array([])
             self.faces = []
