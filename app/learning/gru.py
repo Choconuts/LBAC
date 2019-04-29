@@ -82,11 +82,11 @@ def single_layer_dynamic_gru(input_x, n_steps, n_hidden, seq_len):
 
 
 n_input = 24 * 3  # RNN 单元输入节点的个数
-n_steps = 20  # 序列长度
-n_hidden = 128  # RNN 单元输出节点个数(即隐藏层个数) 1500
+n_steps = 1  # 序列长度
+n_hidden = 1500  # RNN 单元输出节点个数(即隐藏层个数) 1500
 n_disp = vertex_num * 3  # 输出
 batch_size = 4  # 小批量大小 128
-training_step = 100  # 迭代次数
+training_step = 1000  # 迭代次数
 display_step = 10  # 显示步数
 learning_rate = 1e-4  # 学习率
 pose_model_path = '../data/model/pose/test1.ckpt'
@@ -135,14 +135,14 @@ def train_pose():
 
             x_batch = np.zeros((batch_size, n_steps * n_input))
             for i in range(len(x_batch)):
-                x_batch[i] = np.array(pose_gt.pose_ground_truth['poses'][0]).reshape((n_steps * n_input))
+                x_batch[i] = np.array(pose_gt.pose_ground_truth['poses'][0][10:11]).reshape((n_steps * n_input))
             y_batch = np.zeros((batch_size, n_steps, n_disp))
             for i in range(len(x_batch)):
-                y_batch[i] = np.array(pose_gt.pose_ground_truth['displacements'][0]).reshape((n_steps, n_disp))
+                y_batch[i] = np.array(pose_gt.pose_ground_truth['displacements'][0][10:11]).reshape((n_steps, n_disp))
 
             lenths = np.ones((batch_size))
             for i in range(len(x_batch)):
-                lenths[i] = pose_gt.pose_ground_truth['sequence_length'][0]
+                lenths[i] = pose_gt.pose_ground_truth['sequence_length'][0] - 19
 
             # Reshape data to get 28 seq of 28 elements
             x_batch = x_batch.reshape([-1, n_steps, n_input])
@@ -157,27 +157,28 @@ def train_pose():
 
         # 全部训练完成做测试  分成200次，一次测试50个样本
         # 输出测试机准确率   如果一次性全部做测试，内容不够用会出现OOM错误。所以测试时选取比较小的mini_batch来测试
-        for t in range(200):
 
-            x_batch = np.zeros((2, n_steps * n_input))
-            for i in range(len(x_batch)):
-                x_batch[i] = np.array(pose_gt.pose_ground_truth['poses'][0]).reshape((n_steps * n_input))
-            y_batch = np.zeros((2, n_steps, n_disp))
-            for i in range(len(x_batch)):
-                y_batch[i] = np.array(pose_gt.pose_ground_truth['displacements'][0]).reshape((n_steps, n_disp))
-
-            lenths = np.ones((2))
-            for i in range(len(x_batch)):
-                lenths[i] = pose_gt.pose_ground_truth['sequence_length'][0]
-
-            # Reshape data to get 28 seq of 28 elements
-            x_batch = x_batch.reshape([-1, n_steps, n_input])
-            test_accuracy, test_cost = sess.run([pose_accuracy, pose_cost], feed_dict={pose_input_x: x_batch, pose_input_y: y_batch, pose_seq_len: lenths})
-            test_accuracy_list.append(test_accuracy)
-            test_cost_list.append(test_cost)
-            if (t + 1) % 20 == 0:
-                print('Step {0}:Test set accuracy {1},cost {2}.'.format(t + 1, test_accuracy, test_cost))
-        print('Test accuracy:', np.mean(test_accuracy_list))
+        # for t in range(200):
+        #
+        #     x_batch = np.zeros((2, n_steps * n_input))
+        #     for i in range(len(x_batch)):
+        #         x_batch[i] = np.array(pose_gt.pose_ground_truth['poses'][0]).reshape((n_steps * n_input))
+        #     y_batch = np.zeros((2, n_steps, n_disp))
+        #     for i in range(len(x_batch)):
+        #         y_batch[i] = np.array(pose_gt.pose_ground_truth['displacements'][0]).reshape((n_steps, n_disp))
+        #
+        #     lenths = np.ones((2))
+        #     for i in range(len(x_batch)):
+        #         lenths[i] = pose_gt.pose_ground_truth['sequence_length'][0]
+        #
+        #     # Reshape data to get 28 seq of 28 elements
+        #     x_batch = x_batch.reshape([-1, n_steps, n_input])
+        #     test_accuracy, test_cost = sess.run([pose_accuracy, pose_cost], feed_dict={pose_input_x: x_batch, pose_input_y: y_batch, pose_seq_len: lenths})
+        #     test_accuracy_list.append(test_accuracy)
+        #     test_cost_list.append(test_cost)
+        #     if (t + 1) % 20 == 0:
+        #         print('Step {0}:Test set accuracy {1},cost {2}.'.format(t + 1, test_accuracy, test_cost))
+        # print('Test accuracy:', np.mean(test_accuracy_list))
         saver = tf.train.Saver()
         saver.save(sess, pose_model_path)
 

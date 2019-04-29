@@ -126,6 +126,10 @@ class PoseGroundTruth:
         # 'sequence_length': [n * 1]
     }
 
+    pose_seqs = np.array([])
+    pose_disps = np.array([])
+    seq_lengths = np.array([])
+
     vertx_relation_file = '../data/ground_truths/relation/vertex_relation_1.json'
 
     vertex_rela = ClosestVertex().load(vertx_relation_file)
@@ -263,14 +267,19 @@ class PoseGroundTruth:
     def load(self, path):
         with open(path, 'r') as fp:
             self.pose_ground_truth =json.load(fp)
+            self.pose_seqs = np.array(self.pose_ground_truth['poses'])
+            self.pose_disps = np.array(self.pose_ground_truth['displacements'])
+            self.seq_lengths = np.array(self.pose_ground_truth['sequence_length'])
         return self
 
     def pre_process(self, mesh, pose):
         rela = self.vertex_rela.get_rela()
         body_weights = smpl.weights
         cloth_weights = np.zeros((len(mesh.vertices), 24))
+        mesh.save('../test/pose_gt0.obj')
         for i in range(len(mesh.vertices)):
             cloth_weights[i] = body_weights[rela[i]]
+        smpl.set_params(pose=np.array(pose))
         mesh.vertices = self.re_transform(cloth_weights, mesh.vertices)
         mesh.update()
         return mesh, pose
