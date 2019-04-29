@@ -72,15 +72,15 @@ def build_17_betas_sequence():
     shape_sequences(betas)
 
 
-def pose_sequences(betas_list, poses_list, skip):
+def pose_sequences(betas_list, poses_list):
     base_dir = './pose'
-    #if os.path.exists(base_dir):
-    #    if not os.remove(base_dir):
-    #        print('dir exists!')
-    #        return
-    #os.mkdir(base_dir)
+    if os.path.exists(base_dir):
+        if not os.remove(base_dir):
+            print('dir exists!')
+            return
+    os.mkdir(base_dir)
     index = []
-    for i in range(skip, len(poses_list)):
+    for i in range(len(poses_list)):
         if i < len(betas_list):
             betas = betas_list[i]
         else:
@@ -96,17 +96,16 @@ def pose_sequences(betas_list, poses_list, skip):
 
 
 def build_56_poses_sequence():
-    with open('seqs_128.json', 'r') as fp:
+    with open('seqs_56.json', 'r') as fp:
         obj = json.load(fp)
         seqs = np.array(obj)
     poses_list = []
-    for i in range(1):
-        seq = seqs[i]
+    for seq in seqs:
         interps = []
         last = np.zeros((24, 3))
         interps.append(interpolate_param(last, seq[0], 20))
-        j = 0
         last = seq[0]
+        j = 0
         for frame in seq:
             interps.append(interpolate_param(last, frame, 2))
             j += 1
@@ -121,7 +120,6 @@ def build_56_poses_sequence():
     print(np.shape(poses_list))
     # shape params 0 ~ x
     betas = [np.zeros(10)]
-
     param = [-2, -1, 1, 2]
     for i in range(4):
         for j in range(4):
@@ -129,10 +127,10 @@ def build_56_poses_sequence():
             vec[i] = param[j]
             betas.append(vec)
 
-    # 先生成0 shape的120帧 pose 序列，共56条
+    # 先生成0 shape的600帧 pose 序列，共56条
     shapes = interpolate_param(np.zeros((10)), betas[0], 4)
 
-    pose_sequences([shapes], poses_list, 0)
+    pose_sequences([shapes], poses_list)
 
 
 def bujiu():
@@ -144,14 +142,12 @@ def bujiu():
         shutil.copyfile(src, dst)
 
 
-
-
 if __name__ == '__main__':
     """
     """
     # build_17_betas_sequence()
-    build_56_poses_sequence()
-    # bujiu()
+    bujiu()
+    # build_56_poses_sequence()
     # with open('seq_56.json', 'r') as fp:
     #     obj = json.load(fp)
     #     seqs = np.array(obj)

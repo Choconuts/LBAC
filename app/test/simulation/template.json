@@ -1,7 +1,7 @@
 {
-    "frame_time": 0.04,
-    "frame_steps": 8,
-    "end_time": 10,
+    "frame_time": 0.033,
+    "frame_steps": 10,
+    "end_time": 5,
     "cloths": [{
         "mesh": "path/to/cloth/mesh",
         "transform": {"translate": [0, 0, 0], "scale": 1},
@@ -18,11 +18,12 @@
             "aspect_min": 0.2
         }
     }],
-    "obstacles": [{
-        "mesh": "path/to/obstacle/mesh",
-        "transform": {"translate": [0, 0, 0], "scale": 1}
-    }],
-    "gravity": [0, -9.8, 0],
+    "morph_obstacle": {
+        "frame": 5,
+        "dir": "path/to/obstacle/seq",
+        "frame_time": 0.033
+    },
+    "gravity": [0, 0, -9.8],
     "disable": ["remeshing", "separation"],
     "magic": {"repulsion_thickness": 5e-3, "collision_stiffness": 1e6, "fixed_high_res_mesh":false}
 }
