@@ -1,5 +1,5 @@
-from app.geometry.mesh import *
-from app.smpl.smpl_np import *
+from app2.geometry.mesh import *
+from app2.smpl.smpl_np import *
 import os
 import json
 
@@ -53,8 +53,7 @@ def interpolate_param(param1, param2, frame_num):
     return np.array(res)
 
 
-def shape_sequences(shapes, frame=5):
-    base_dir = './shape'
+def shape_sequences(shapes, frame=5, base_dir = './shape'):
     if os.path.exists(base_dir):
         if not os.remove(base_dir):
             print('dir exists!')
@@ -102,8 +101,6 @@ def pose_sequences(betas_list, poses_list, skip):
         json.dump(index, fp)
 
 
-
-
 def build_56_poses_sequence():
     with open('seqs_128.json', 'r') as fp:
         obj = json.load(fp)
@@ -142,17 +139,6 @@ def build_56_poses_sequence():
     shapes = interpolate_param(np.zeros((10)), betas[0], 4)
 
     pose_sequences([shapes], poses_list, 0)
-
-
-def bujiu():
-    base = './pose'
-    for i in range(56):
-        src = os.path.join(os.path.join(base, 'seq_' + str(i)), '21.obj')
-        dst = os.path.join(os.path.join(base, 'seq_' + str(i)), '20.obj')
-        import shutil
-        shutil.copyfile(src, dst)
-
-
 
 
 if __name__ == '__main__':
