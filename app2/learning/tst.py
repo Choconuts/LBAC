@@ -4,35 +4,27 @@ import numpy as np
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 from app2.learning.mlp import MLP
-from app2.learning.ground_truth import TstGroundTruth
+from app2.learning.gru import GRU
+from app2.smpl.smpl_np import SMPLModel
+from app2.configure import *
+from app2.learning.ground_truth import TstGroundTruth, PoseGroundTruth, BetaGroundTruth
 
-x = [0, 1, 2, 3, 4]
-y = [4, 3, 2, 1, 0]
+smpl = SMPLModel(smpl_model_path)
+pose_gt = PoseGroundTruth('../../app/data/beta_simulation/avg_smooth.obj', smpl).load('../../app/data/ground_truths/gt_files/pose_gt_4.json')
+beta_gt = BetaGroundTruth().load('../../app/data/ground_truths/gt_files/beta_gt_4.json')
 
-mlp = MLP(1, 1)
-gt = TstGroundTruth()
-gt.x = x
-gt.y = y
-mlp.learning_rate = 1e-2
+def mlp_tst():
+    mlp = MLP() # 20 * 24 * 3, 20 * 7366 * 3
+    mlp.batch_size = 1
+    mlp.train(beta_gt, "tst/beta_model/1")
+    print(np.shape(pose_gt.pose_seqs))
+    print(np.shape(pose_gt.pose_disps))
+    # mlp.train(pose_gt, "tst/pose_model1")
 
-mlp.train(gt, 'tst/model3')
+    print(pose_gt.get_batch(2)[2])
 
-mlp.load('tst/model3')
-r = mlp.predict(np.array([[1.2]]))
-print(r)
-r = mlp.predict(np.array([[0]]))
-print(r)
-# keep_prob = tf.placeholder(tf.float32, name="keep_prob")
-# x_input = tf.placeholder(tf.float32, shape=[None, 1], name="x")
-# y_true = tf.placeholder(tf.float32, shape=[None, 2], name="y")
 
-mlp.load('tst/model3')
-mlp.load('tst/model3')
-mlp.load('tst/model3')
-mlp.load('tst/model3')
-r = mlp.predict(np.array([[4]]))
-print(r)
 
 
 if __name__ == '__main__':
-    pass
+    print(list(range(1, 10)))

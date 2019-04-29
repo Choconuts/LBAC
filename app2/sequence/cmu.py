@@ -33,16 +33,28 @@ def reflect(i):
     return str(int(10001 * i / 56)) + '.mat'
 
 
-if __name__ == '__main__':
-    # f = find_all_files('..', 'info.mat')
-    # j = parse_joints(f[0])
-    info_dir = r'I:\Choconuts\Download\SURREAL_v1\all_infos'
+def build_joints_sequences_json(info_dir, out_file):
     obj = []
     for i in range(128):
         joints = parse_joints(os.path.join(info_dir, reflect(i)))
         obj.append(joints.tolist())
     print(np.shape(obj))
-    with open('seqs_128_of_joints.json', 'w') as fp:
+    with open(out_file, 'w') as fp:
         json.dump(obj, fp)
+
+
+if __name__ == '__main__':
+    """
+    """
+    build_joints_sequences_json(r'I:\Choconuts\Download\SURREAL_v1\all_infos', 'seqs_128_of_joints.json')
+
+    # info_dir = r'I:\Choconuts\Download\SURREAL_v1\all_infos'
+    # obj = []
+    # for i in range(128):
+    #     joints = parse_joints(os.path.join(info_dir, reflect(i)))
+    #     obj.append(joints.tolist())
+    # print(np.shape(obj))
+    # with open('seqs_128_of_joints.json', 'w') as fp:
+    #     json.dump(obj, fp)
 
 

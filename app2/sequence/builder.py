@@ -1,7 +1,10 @@
 from app2.geometry.mesh import *
 from app2.smpl.smpl_np import *
+from app2.configure import *
 import os
 import json
+
+smpl = SMPLModel(smpl_model_path)
 
 
 def build_sequence(seq_dir, betas, poses=None, transforms=None):
@@ -53,7 +56,7 @@ def interpolate_param(param1, param2, frame_num):
     return np.array(res)
 
 
-def shape_sequences(shapes, frame=5, base_dir = './shape'):
+def shape_sequences(shapes, base_dir, frame):
     if os.path.exists(base_dir):
         if not os.remove(base_dir):
             print('dir exists!')
@@ -69,7 +72,7 @@ def shape_sequences(shapes, frame=5, base_dir = './shape'):
         json.dump(index, fp)
 
 
-def build_17_betas_sequence():
+def build_betas_sequences(out_dir='./shape', n_frame=5):
     betas = [np.zeros(10)]
     param = [-2, -1, 1, 2]
     for i in range(4):
@@ -77,11 +80,10 @@ def build_17_betas_sequence():
             vec = np.zeros(10)
             vec[i] = param[j]
             betas.append(vec)
-    shape_sequences(betas)
+    shape_sequences(betas, out_dir, n_frame)
 
 
-def pose_sequences(betas_list, poses_list, skip):
-    base_dir = './pose'
+def pose_sequences(betas_list, poses_list, base_dir, skip=0):
     #if os.path.exists(base_dir):
     #    if not os.remove(base_dir):
     #        print('dir exists!')
@@ -101,12 +103,12 @@ def pose_sequences(betas_list, poses_list, skip):
         json.dump(index, fp)
 
 
-def build_56_poses_sequence():
-    with open('seqs_128.json', 'r') as fp:
+def build_poses_sequences(json_file, build_range, out_dir='./pose'):
+    with open(json_file, 'r') as fp:
         obj = json.load(fp)
         seqs = np.array(obj)
     poses_list = []
-    for i in range(1):
+    for i in range(build_range[1]):
         seq = seqs[i]
         interps = []
         last = np.zeros((24, 3))
@@ -135,15 +137,12 @@ def build_56_poses_sequence():
             vec[i] = param[j]
             betas.append(vec)
 
-    # 先生成0 shape的120帧 pose 序列，共56条
+    # 先生成0 shape的120帧 pose 序列
     shapes = interpolate_param(np.zeros((10)), betas[0], 4)
 
-    pose_sequences([shapes], poses_list, 0)
+    pose_sequences([shapes], poses_list, out_dir, build_range[0])
 
 
 if __name__ == '__main__':
     """
     """
-    # build_17_betas_sequence()
-    build_56_poses_sequence()
-    # bujiu()

@@ -1,14 +1,11 @@
-from app.learning.regressor import *
-from app.smpl.smpl_np import smpl
-from app.learning.ground_truths import beta_gt
-from app.display.shader.shaders import *
-from app.display.vbo import *
+from app2.smpl.smpl_np import SMPLModel
+from app2.learning.ground_truth import BetaGroundTruth, PoseGroundTruth
+from app2.geometry.closest_vertex import ClosestVertex
+from app2.learning.mlp import MLP
+from app2.display.shader.shaders import *
+from app2.display.utils import *
+from app2.configure import *
 import numpy as np
-from app.display.simple_display import VertexArray
-from pyoctree import pyoctree as ot
-from app.learning.ground_truths import PoseGroundTruth
-import time
-shape_regressor = ShapeRegressor()
 
 
 def get_body(shape, pose=None):
@@ -16,23 +13,36 @@ def get_body(shape, pose=None):
 
 
 def get_cloth(shape):
-    return shape_regressor.feed(shape).apply(beta_gt.template)
+    disp = mlp.predict([shape])[0].reshape((7366, 3))
+    mesh = Mesh(beta_gt.template)
+    mesh.vertices += disp
+    return mesh
 
 
 def apply_winkle(cloth, pose):
+    dulp = []
+    for i in range(20):
+        dulp.append(pose)
+
+    disp = np.array(mlp2.predict([np.array(dulp)])).reshape((20, 7366, 3))[10]
+    disp = pose_gt.pose_disps[0][19]
+    cloth.vertices += disp
     return cloth
 
 
-def apply_pose(cloth, body, pose, rela):
+def apply_pose(cloth, pose, rela):
     body_weights = smpl.weights
+    smpl.set_params(pose)
     cloth_weights = np.zeros((len(cloth.vertices), 24))
     for i in range(len(cloth.vertices)):
         cloth_weights[i] = body_weights[rela[i]]
-    cloth.vertices = PoseGroundTruth().apply(cloth_weights, cloth.vertices)
+    cloth.vertices = PoseGroundTruth('../../app/data/beta_simulation/avg_smooth.obj', smpl).apply(cloth_weights, cloth.vertices)
     cloth.update()
     return cloth
 
+
 impact = []
+
 
 def post_processing(cloth, body, rela, tst=False):
     import math
@@ -89,8 +99,8 @@ def post_processing(cloth, body, rela, tst=False):
         bn = body.normal[rela[i]]
         cn = cloth.normal[i]
         if np.dot(vb - vc, bn) > 0:
-            spread(i, bn * np.dot(vb - vc, bn) * 1.2)
-        cloth.vertices[i] += cn * 0.006
+            spread(i, bn * np.dot(vb - vc, bn) * .8)
+        cloth.vertices[i] += cn * 0.002
 
 
     return cloth
@@ -144,231 +154,42 @@ def draw(cloth, body):
     glutMainLoop()
 
 
-def get_closest_points(cloth, body):
-    """
-    :param cloth: 7366 vertices
-    :param body: 6890 vertices
-    :return: 每个衣服顶点最近的人体顶点标号的列表
-    """
-    # hash the body
-    import math
-    class LinearFunc:
-        """
-        先用二次把
-        """
-        def __init__(self, thrs, ks): # [?, 0.5, 0.7], [1.2, 1, ?]
-            import copy
-            self.thrs = copy.deepcopy(thrs)
-            self.thrs.insert(0, 0)
-            self.ks = copy.deepcopy(ks)
-            k = 1
-            for i in range(len(ks)):
-                k -= ks[i] * (self.thrs[i + 1] - self.thrs[i])
-            self.ks.append(k / (1 - self.thrs[len(ks)]))
-            self.bs = [0]
-            for i in range(len(ks)):
-                self.bs.append(self.bs[len(self.bs) - 1] + ks[i] * (self.thrs[i + 1] - self.thrs[i]))
-
-        def fin(self, x):
-            y = 0
-            for i in range(len(self.thrs) - 1):
-                y += (self.ks[i] * (x - self.thrs[i]) + self.bs[i]) * (self.thrs[i] < x < self.thrs[i + 1])
-            return x
-
-        def fout(self, x):
-            return x ** 2
-
-    lf = LinearFunc([0.2, 0.5], [2, 1.5])
-    resolution = 80
-
-    min_x = np.min(body.vertices)
-    max_x = np.max(body.vertices)
-
-    def my_hash(x, step):
-        x = (x - min_x) / (max_x - min_x + 0.0001)
-        y = int(lf.fin(x) / step)
-        assert y >= 0
-        return y
-
-    # 建立多层哈希
-    resolu = resolution
-    resolutions = []
-    hash_tables = []
-    lists_map = []
-    while resolu > 0:
-        resolutions.append(resolu)
-        step = 1 / resolu
-        hash_table = np.zeros((resolu, resolu, resolu), np.int)
-        lists = [[]]
-        i = 1
-        vi = 0
-        for v in body.vertices:
-            v0 = my_hash(v[0], step)
-            v1 = my_hash(v[1], step)
-            v2 = my_hash(v[2], step)
-            if hash_table[v0][v1][v2] == 0:
-                hash_table[v0][v1][v2] = i
-                lists.append([vi])
-                i += 1
-            else:
-                lists[hash_table[v0][v1][v2]].append(vi)
-            vi += 1
-
-
-        lists_map.append(lists)
-        hash_tables.append(hash_table)
-        resolu = int(resolu / 5)
-
-    timer.tick('hash')
-
-    res = []
-    for v in cloth.vertices:
-        search_list = []
-        layer = 0
-        while True:
-            step = 1 / resolutions[layer]
-            v0 = my_hash(v[0], step)
-            v1 = my_hash(v[1], step)
-            v2 = my_hash(v[2], step)
-            if hash_tables[layer][v0][v1][v2] == 0:
-                layer += 1
-                continue
-            if layer < len(resolutions) - 1:
-                layer += 1
-            step = 1 / resolutions[layer]
-            v0 = my_hash(v[0], step)
-            v1 = my_hash(v[1], step)
-            v2 = my_hash(v[2], step)
-            search_list.extend(lists_map[layer][hash_tables[layer][v0][v1][v2]])
-            break
-        closest_v = -1
-        closest_dist = 100
-        for p in search_list:
-            d = np.linalg.norm(v - body.vertices[p])
-            if d < closest_dist:
-                closest_dist = d
-                closest_v = p
-        res.append(closest_v)
-
-    timer.tick('find')
-
-    def travel():
-        for i in range(len(cloth.vertices)):
-            now = res[i]
-            vc = cloth.vertices[i]
-            while True:
-                min_d = np.linalg.norm(vc - body.vertices[now])
-                min_v = -1
-                for v in body.edges[res[i]]:
-                    d = np.linalg.norm(vc - body.vertices[v])
-                    if d < min_d:
-                        min_d = d
-                        min_v = v
-                if min_v < 0:
-                    break
-                now = min_v
-            res[i] = now
-    travel()
-
-    return res
-
-
-def get_closest(cloth, body):
-    rela = []
-    for vc in cloth.vertices:
-        min_d = 100
-        min_v = -1
-        for i in range(len(body.vertices)):
-            d = np.linalg.norm(body.vertices[i] - vc)
-            if d < min_d:
-                min_d = d
-                min_v = i
-        rela.append(min_v)
-    return rela
-
-
-class Timer:
-    def __init__(self, prt=True):
-        self.start_time = time.time()
-        self.last_time = self.start_time
-        self.print = prt
-
-    def tick(self, msg=''):
-        res = time.time() - self.last_time
-        if self.print:
-            print(msg, res)
-        self.last_time = time.time()
-        return res
-
-    def tock(self, msg=''):
-        if self.print:
-            print(msg, time.time() - self.last_time)
-        return time.time() - self.last_time
-
-
-class VertexRelation:
-    def __init__(self):
-        self.relation = []
-
-    def get_rela(self):
-        return self.relation
-
-    def save(self, file):
-        import json
-        with open(file, 'w') as fp:
-            json.dump(self.relation, fp)
-        return self
-
-    def load(self, file):
-        import json
-        with open(file, 'r') as fp:
-            self.relation = json.load(fp)
-        return self
-
-    def calc(self, cloth, body):
-        self.relation = get_closest_points(cloth, body)
-        return self
-
-    def update(self, cloth, body):
-        for i in range(len(cloth.vertices)):
-            now = self.relation[i]
-            vc = cloth.vertices[i]
-            while True:
-                min_d = np.linalg.norm(vc - body.vertices[now])
-                min_v = -1
-                for v in body.edges[self.relation[i]]:
-                    d = np.linalg.norm(vc - body.vertices[v])
-                    if d < min_d:
-                        min_d = d
-                        min_v = v
-                if min_v < 0:
-                    break
-                now = min_v
-            self.relation[i] = now
-        return self
-
-
-global timer
-
 if __name__ == '__main__':
-    shape = beta_gt.betas[3]
+    beta_gt = BetaGroundTruth().load('../../app/data/ground_truths/gt_files/beta_gt_4.json') \
+        .load_template('../../app/data/beta_simulation/avg_smooth.obj')
+    mlp = MLP().load('../learning/tst/beta_model/1')
+    mlp2 = MLP(20 * 24 * 3, 20 * 7366 * 3).load('../learning/tst/pose_model1')
+    smpl = SMPLModel(smpl_model_path)
+
+
+    shape = beta_gt.betas[0]
     pose = [[0, 0, 0]]
     for i in range(23):
         pose.append([-0.1, -0.2, 0.1])
-    pose = np.array(pose)
+    pose_gt = PoseGroundTruth('../../app/data/beta_simulation/avg_smooth.obj', smpl).load(
+        '../../app/data/ground_truths/gt_files/pose_gt_4.json')
+    pose = pose_gt.pose_seqs[0][19]
+    pose[0][0] = 0
+    pose[0][1] = 0
+    pose[0][2] = 0
+
+    timer = Timer()
     cloth = get_cloth(shape)
     body = get_body(shape)
-    timer = Timer(False)
-    # vertex_rela =  VertexRelation().calc(cloth, body).save('shape/test_rela.json')
-    vertex_rela = VertexRelation().load('shape/test_rela.json')
+
+    # vertex_rela =  ClosestVertex().calc(cloth, body).save('shape/record_2.json')
+    vertex_rela = ClosestVertex().load(vertex_relation_path)
     rela = vertex_rela.get_rela()
+
+    apply_winkle(cloth, pose)
+
     body_posed = get_body(shape, pose)
-    # apply_pose(cloth, body, pose, rela)
-    # rela = vertex_rela.update(cloth, body_posed).get_rela()
-    rela = vertex_rela.update(cloth, body).get_rela()
-    post_processing(cloth, body, rela)
+    # apply_pose(cloth, pose, rela)
+    rela = vertex_rela.update(cloth, body_posed).get_rela()
+    # rela = vertex_rela.update(cloth, body).get_rela()
+    # post_processing(cloth, body_posed, rela)
     # post_processing(cloth, body, rela, True)
-    # from app.geometry.smooth import smooth_bounds
+    from app2.geometry.smooth import smooth
     # smooth_bounds(cloth, 10)
     smooth(cloth, 2)
 

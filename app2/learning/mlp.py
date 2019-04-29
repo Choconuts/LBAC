@@ -41,7 +41,7 @@ class MLP:
     hidden = [20]
     model = 'model'
 
-    def __init__(self, n_input=10, n_output = 7366 * 3):
+    def __init__(self, n_input=10, n_output=7366 * 3):
         self.n_input = n_input
         self.n_output = n_output
 
@@ -71,12 +71,13 @@ class MLP:
             sess.run(tf.global_variables_initializer())
             for i in range(self.iter):
                 batch = ground_truth.get_batch(self.batch_size)
+                batch[0] = batch[0].reshape((-1, self.n_input))
+                batch[1] = batch[1].reshape((-1, self.n_output))
                 if i % self.show_step == 0:
                     train_accuracy = cross_entropy.eval(session=sess, feed_dict={x_input: batch[0], y_true: batch[1], keep_prob: 1})
                     print('step {}, training accuracy: {}'.format(i, train_accuracy))
                 train_step.run(session=sess, feed_dict={x_input: batch[0], y_true: batch[1], keep_prob: self.keep_probability})
 
-            print(sess.run(output, feed_dict={x_input: np.array([[-2.2]]), keep_prob: 1}))
             if model_path:
                 saver = tf.train.Saver()
                 tf.add_to_collection('output', output)
@@ -99,6 +100,7 @@ class MLP:
         return self
 
     def predict(self, inputs):
+        inputs = np.array(inputs).reshape((-1, self.n_input))
         tf.reset_default_graph()
         with tf.Session() as restore_sess:
             restore_saver = tf.train.import_meta_graph(self.model + '.meta')
