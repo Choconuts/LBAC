@@ -169,7 +169,6 @@ if __name__ == '__main__':
     beta_gt.load(beta_ground_truth).load_template()
     pose_gt.load(pose_ground_truth)
 
-
     shape = beta_gt.betas[0]
     pose = pose_gt.pose_seqs[0][19]
     pose = remove_rotation(pose)

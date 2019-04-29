@@ -313,8 +313,28 @@ class PoseGroundTruth(GroundTruth):
         mesh.update()
         return mesh, pose
 
+    batch_pointer = 0
+
     def get_batch(self, size):
-        batch = duplicate([self.pose_seqs, self.pose_disps, self.seq_lengths], size)
+        n_seq = len(self.pose_seqs)
+        if size > n_seq:
+            return duplicate([self.pose_seqs, self.pose_disps, self.seq_lengths], size)
+        if size <= n_seq - self.batch_pointer:
+            batch = [self.pose_seqs[self.batch_pointer:self.batch_pointer + size],
+                     self.pose_disps[self.batch_pointer:self.batch_pointer + size],
+                     self.seq_lengths[self.batch_pointer:self.batch_pointer + size]]
+            self.batch_pointer += size
+            if self.batch_pointer == n_seq:
+                self.batch_pointer = 0
+            return batch
+        batch = [self.pose_seqs[self.batch_pointer:n_seq],
+                 self.pose_disps[self.batch_pointer:n_seq],
+                 self.seq_lengths[self.batch_pointer:n_seq]]
+        rest = size - n_seq + self.batch_pointer # res > 0
+        batch[0] = np.concatenate((batch[0], self.pose_seqs[0:rest]), 0)
+        batch[1] = np.concatenate((batch[1], self.pose_disps[0:rest]), 0)
+        batch[2] = np.concatenate((batch[2], self.seq_lengths[0:rest]), 0)
+        self.batch_pointer = rest
         return batch
 
 

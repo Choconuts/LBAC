@@ -77,6 +77,8 @@ def train_shape_model():
 
     vertex_num = len(beta_gt.template.vertices)
     mlp = MLP(10, vertex_num * 3)
+    mlp.keep_probability = 0.99                     # 0.8 in the paper
+    mlp.hidden = [20]                               # [20] in the paper
     mlp.train(beta_gt, shape_model_path)
 
 
@@ -85,7 +87,9 @@ def train_pose_model():
     beta_gt.load_template()
 
     vertex_num = len(beta_gt.template.vertices)
-    gru = GRU(24 * 3, vertex_num * 3, 20)
+    gru = GRU(24 * 3, vertex_num * 3, 20)           # same as n_pose in ground-truth
+    gru.keep_probability = 0.99                     # 0.8 in the paper
+    gru.n_hidden = 128                              # 1500 in the paper
     gru.train(pose_gt, pose_model_path)
 
 
