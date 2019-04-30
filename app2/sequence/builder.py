@@ -21,18 +21,20 @@ def build_sequence(seq_dir, betas, poses=None, transforms=None):
     if poses is None:
         poses = np.zeros((len(betas), 24, 3))
     for i in range(len(poses)):
-        if i > len(betas) - 1:
-            beta = betas[len(betas) - 1]
-        else:
-            beta = betas[i]
+        # changed
+        while i > len(betas) - 1:
+            betas.append(betas[len(betas) - 1])
+        beta = betas[i]
         if transforms is not None:
             smpl.set_params(beta=beta, pose=poses[i], trans=transforms[i])
         else:
             smpl.set_params(beta=beta, pose=poses[i])
         mesh = smpl.get_mesh()
         mesh.save(os.path.join(seq_dir, str(i) + '.obj'))
-    with open(os.path.join(seq_dir, 'meta.json'), 'w') as fp:
+    with open(os.path.join(seq_dir, 'pose.json'), 'w') as fp:
         json.dump(poses.tolist(), fp)
+    with open(os.path.join(seq_dir, 'beta.json'), 'w') as fp:
+        json.dump(betas.tolist(), fp)
 
 
 def interpolate_param(param1, param2, frame_num):
@@ -57,19 +59,15 @@ def interpolate_param(param1, param2, frame_num):
 
 
 def shape_sequences(shapes, base_dir, frame):
-    if os.path.exists(base_dir):
-        if not os.remove(base_dir):
-            print('dir exists!')
-            return
-    os.mkdir(base_dir)
-    index = []
+    # if os.path.exists(base_dir):
+    #     if not os.remove(base_dir):
+    #         print('dir exists!')
+    #         return
+    # os.mkdir(base_dir)
     for i in range(len(shapes)):
         betas = interpolate_param(np.zeros((10)), shapes[i], frame)
         seq_dir = os.path.join(base_dir, 'seq_' + str(i))
         build_sequence(seq_dir, betas)
-        index.append(seq_dir)
-    with open(os.path.join(base_dir, 'index.json'), 'w') as fp:
-        json.dump(index, fp)
 
 
 def build_betas_sequences(out_dir='./shape', n_frame=5):
@@ -89,21 +87,15 @@ def pose_sequences(betas_list, poses_list, base_dir, skip=0):
     #        print('dir exists!')
     #        return
     #os.mkdir(base_dir)
-    index = []
     for i in range(skip, len(poses_list)):
-        if i < len(betas_list):
-            betas = betas_list[i]
-        else:
-            betas = betas_list[len(betas_list) - 1]
-        poses = poses_list[i]
-        seq_dir = os.path.join(base_dir, 'seq_' + str(i))
-        build_sequence(seq_dir, betas, poses)
-        index.append(seq_dir)
-    with open(os.path.join(base_dir, 'index.json'), 'w') as fp:
-        json.dump(index, fp)
+        for j in range(len(betas_list)):
+            poses = poses_list[i]
+            betas = betas_list[j]
+            seq_dir = os.path.join(base_dir, 'seq_' + str(i * len(betas_list) + j))
+            build_sequence(seq_dir, betas, poses)
 
 
-def build_poses_sequences(json_file, build_range, out_dir='./pose'):
+def build_poses_sequences(json_file, build_range, out_dir='./pose', betas_flag=False):
     with open(json_file, 'r') as fp:
         obj = json.load(fp)
         seqs = np.array(obj)
@@ -138,9 +130,15 @@ def build_poses_sequences(json_file, build_range, out_dir='./pose'):
             betas.append(vec)
 
     # 先生成0 shape的120帧 pose 序列
-    shapes = interpolate_param(np.zeros((10)), betas[0], 4)
+    shapes_list = []
+    betas_range = 1
+    if betas_flag:
+        betas_range = 17
+    for b in range(betas_range):
+        shapes = interpolate_param(np.zeros(10), betas[b], 4)
+        shapes_list.append(shapes)
 
-    pose_sequences([shapes], poses_list, out_dir, build_range[0])
+    pose_sequences(shapes_list, poses_list, out_dir, build_range[0])
 
 
 if __name__ == '__main__':

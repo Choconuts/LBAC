@@ -108,7 +108,7 @@ def post_processing(cloth, body, rela, tst=False):
         cn = cloth.normal[i]
         if np.dot(vb - vc, bn) > 0:
             spread(i, bn * np.dot(vb - vc, bn) * 1.1, 30)
-        cloth.vertices[i] += cn * 0.005
+        cloth.vertices[i] += cn * 0.004
 
     return cloth
 
@@ -169,8 +169,8 @@ if __name__ == '__main__':
     beta_gt.load(beta_ground_truth).load_template()
     pose_gt.load(pose_ground_truth)
 
-    shape = beta_gt.betas[0]
-    pose = pose_gt.pose_seqs[0][19]
+    shape = beta_gt.betas[5]
+    pose = pose_gt.pose_seqs[0][12]
     pose = remove_rotation(pose)
 
     timer = Timer()
@@ -181,12 +181,12 @@ if __name__ == '__main__':
     vertex_rela = ClosestVertex().load(vertex_relation_path)
     rela = vertex_rela.update(cloth, body).get_rela()
 
-    post_processing(cloth, body, rela)
+    # post_processing(cloth, body, rela)
 
-    # body_posed = get_body(shape, pose)
-    # apply_pose(cloth, pose, rela)
-    # rela_posed = vertex_rela.update(cloth, body_posed).get_rela()
-    # post_processing(cloth, body_posed, rela_posed)
+    body_posed = get_body(shape, pose)
+    apply_pose(cloth, pose, rela)
+    rela_posed = vertex_rela.update(cloth, body_posed).get_rela()
+    post_processing(cloth, body_posed, rela_posed)
 
     from app2.geometry.smooth import smooth, smooth_bounds
     smooth_bounds(cloth, 4)
@@ -194,5 +194,5 @@ if __name__ == '__main__':
 
     # saved_cloth = Mesh().load('../test/save_mesh.obj')
     cloth.update()
-    draw(cloth, body)
+    draw(cloth, body_posed)
 

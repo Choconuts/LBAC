@@ -187,9 +187,10 @@ class PoseGroundTruth(GroundTruth):
         # 'sequence_length': [n * 1]
     }
 
-    def __init__(self, template_mesh_file, smpl):
+    def __init__(self, template_mesh_file, smpl, pose_seq_dir):
         self.template = Mesh().load(template_mesh_file)
         self.smpl = smpl
+        self.pose_seq_dir = pose_seq_dir
 
     pose_seqs = np.array([])
     pose_disps = np.array([])
@@ -232,10 +233,16 @@ class PoseGroundTruth(GroundTruth):
             return os.path.join(results_dir, str(i))
 
         def get_seq_poses(i):
-            sd = os.path.join('../sequence/pose/', 'seq_' + str(i))
-            with open(os.path.join(sd, 'meta.json'), 'r') as fp:
+            sd = os.path.join(self.pose_seq_dir, 'seq_' + str(i))
+            with open(os.path.join(sd, 'meta.json'), 'r') as fp:        # TODO
                 poses = json.load(fp)
             return poses
+
+        def get_seq_betas(i):
+            sd = os.path.join(self.pose_seq_dir, 'seq_' + str(i))
+            with open(os.path.join(sd, 'beta.json'), 'r') as fp:
+                betas = json.load(fp)
+            return betas
 
         keyframes = []
         for i in range(n_pose):
@@ -254,19 +261,23 @@ class PoseGroundTruth(GroundTruth):
 
         for i in gens:
             poses = get_seq_poses(i)
+            # betas = get_seq_betas(i) TODO
             out_meshes = []
             out_poses = [] # 10- * 24 * 3
+            # out_betas = []
             for k in keyframes:
                 mesh = load_seq_obj(get_seq_dir(i), k)
                 if mesh == None:
                     break
                 out_meshes.append(mesh)
                 out_poses.append(poses[k])
+                # out_betas.append(betas[k])
             act_len = len(out_meshes)
             all_out_seqlen.append(act_len)
             for i in range(act_len):
                 out_meshes[i], out_poses[i] = self.pre_process(out_meshes[i], out_poses[i])
             out_poses = np.array(out_poses)
+            # out_betas = np.array(out_betas)
             out_poses = np.pad(out_poses, ((0, n_pose - act_len), (0, 0), (0, 0)), 'constant')
             out_poses = out_poses.tolist()
 
@@ -305,7 +316,6 @@ class PoseGroundTruth(GroundTruth):
         rela = self.vertex_rela.get_rela()
         body_weights = self.smpl.weights
         cloth_weights = np.zeros((len(mesh.vertices), 24))
-        mesh.save('../test/pose_gt0.obj')
         for i in range(len(mesh.vertices)):
             cloth_weights[i] = body_weights[rela[i]]
         self.smpl.set_params(pose=np.array(pose))
