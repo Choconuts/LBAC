@@ -2,8 +2,6 @@ import numpy as np
 import pickle
 from app.geometry.mesh import Mesh
 
-smpl_model_path = '../data/model/smpl.pkl'
-
 
 class SMPLModel():
     def __init__(self, model_path):
@@ -229,9 +227,6 @@ class SMPLModel():
         return mesh
 
 
-# smpl = SMPLModel('./model.pkl')
-smpl = SMPLModel(smpl_model_path)
-
 if __name__ == '__main__':
     np.random.seed(1212)
     pose = []
@@ -245,7 +240,4 @@ if __name__ == '__main__':
     beta[3] = 2
     beta = np.array(beta)
     print(beta)
-    trans = np.zeros(smpl.trans_shape)
-    smpl.set_params(beta=beta, pose=pose, trans=trans)
-    smpl.save_to_obj('./smpl_np_3.obj')
 

@@ -36,26 +36,46 @@ def single_layer_dynamic_gru(input_x, n_steps, n_hidden, seq_len):
     # hiddens = tf.transpose(hiddens, [1, 0, 2])
     return hiddens, states
 
-
 class GRU:
 
     n_input = 24 * 3  # RNN 单元输入节点的个数
-    n_steps = 20  # 序列长度
+    n_steps = 5  # 序列长度
     n_hidden = 128  # RNN 单元输出节点个数(即隐藏层个数) 1500
     n_output = 7366 * 3  # 输出
     batch_size = 128  # 小批量大小 128
     iter = 1000  # 迭代次数
     show_step = 10  # 显示步数
     learning_rate = 1e-4  # 学习率
-    decay_step = 200
     keep_probability = 0.8
     model = 'model'
 
-    def __init__(self, n_input=24 * 3, n_output=7366 * 3, n_steps=20):
+    def __init__(self, n_input=24 * 3, n_output=7366 * 3):
         self.n_input = n_input
         self.n_output = n_output
-        self.n_steps = n_steps
 
+    def build_model(self, layers):
+        model = keras.Sequential()
+
+        model.add(keras.layers.GRU(input_dim=layers[0], output_dim=layers[1], activation='tanh', return_sequences=True))
+        model.add(keras.layers.Dropout(0.15))  # Dropout overfitting
+
+        # model.add(GRU(layers[2],activation='tanh', return_sequences=True))
+        # model.add(Dropout(0.2))  # Dropout overfitting
+
+        model.add(keras.layers.GRU(layers[2], activation='tanh', return_sequences=False))
+        model.add(keras.layers.Dropout(0.2))  # Dropout overfitting
+
+        model.add(keras.layers.Dense(output_dim=layers[3]))
+        model.add(keras.layers.Activation("linear"))
+
+        start = time.time()
+        # sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+        # model.compile(loss="mse", optimizer=sgd)
+        model.compile(loss="mse", optimizer="rmsprop")  # Nadam rmsprop
+        print("Compilation Time : ", time.time() - start)
+        return model
+
+    @property
     def gen_graph(self):
         graph = tf.Graph()
         with graph.as_default():
@@ -69,10 +89,14 @@ class GRU:
             # 可以看做隐藏层
             hidden, states = single_layer_dynamic_gru(x_input, self.n_steps, self.n_hidden, seq_lens)
 
+            # 可以看做隐藏层
+            model = keras.Sequential()
+            model.add(keras.layers.Embedding(input_length=seq_lens))
+            model.add(keras.layers.GRU())
             # 取 RNN 最后一个时序的输出，然后经过全连接网络得到输出值
             hidden = tf.nn.dropout(hidden, keep_prob)
             print(np.shape(hidden))
-            output = tf.contrib.layers.fully_connected(inputs=hidden, num_outputs=self.n_output, activation_fn=None)
+            output = tf.contrib.layers.fully_connected(inputs=hidden, num_outputs=self.n_output)
             print(np.shape(output))
 
             '''
@@ -85,11 +109,7 @@ class GRU:
             '''
             求解
             '''
-            global_step = tf.Variable(0, trainable=False)
-            learning_rate = tf.train.exponential_decay(self.learning_rate,
-                                                       global_step=global_step,
-                                                       decay_steps=self.decay_step, decay_rate=0.8)
-            train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy, global_step=global_step)
+            train_step = tf.train.AdamOptimizer(self.learning_rate).minimize(cross_entropy)
 
             # 预测结果评估
             pose_accuracy = cross_entropy  # 求损失
@@ -97,7 +117,7 @@ class GRU:
         return graph, x_input, y_true, seq_lens, output, train_step, cross_entropy, keep_prob
 
     def train(self, ground_truth, model_path=None):
-        graph, x_input, y_true, seq_lens, output, train_step, cross_entropy, keep_prob = self.gen_graph()
+        graph, x_input, y_true, seq_lens, output, train_step, cross_entropy, keep_prob = self.gen_graph
 
         with tf.Session(graph=graph) as sess:
             # 使用会话执行图

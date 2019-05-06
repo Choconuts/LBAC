@@ -75,10 +75,6 @@ def smooth_laplacian(mesh, times=1, level=1):
     return mesh
 
 
-def expand(mesh, rate):
-    mesh.vertices *= rate
-
-
 def taubin(mesh, mu, level=1):
     new_vertices = []
     new_vertices.extend(mesh.vertices)

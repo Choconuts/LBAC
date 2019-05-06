@@ -77,7 +77,7 @@ def get_closest_points(cloth, body):
         hash_tables.append(hash_table)
         resolu = int(resolu / 5)
 
-    timer.tick('hash')
+    # timer.tick('hash')
 
     res = []
     for v in cloth.vertices:
@@ -108,7 +108,7 @@ def get_closest_points(cloth, body):
                 closest_v = p
         res.append(closest_v)
 
-    timer.tick('find')
+    # timer.tick('find')
 
     def travel():
         for i in range(len(cloth.vertices)):
@@ -153,6 +153,7 @@ class Timer:
 class ClosestVertex:
     def __init__(self):
         self.relation = []
+        self.relation0 = []
 
     def get_rela(self):
         return self.relation
@@ -166,8 +167,12 @@ class ClosestVertex:
     def load(self, file):
         import json
         with open(file, 'r') as fp:
-            self.relation = json.load(fp)
+            self.relation = np.array(json.load(fp))
+            self.relation0 = np.copy(self.relation)
         return self
+
+    def reset(self):
+        self.relation = np.copy(self.relation0)
 
     def calc(self, cloth, body):
         self.relation = get_closest_points(cloth, body)
@@ -191,8 +196,6 @@ class ClosestVertex:
             self.relation[i] = now
         return self
 
-
-global timer
 
 if __name__ == '__main__':
     pass

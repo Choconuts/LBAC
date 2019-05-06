@@ -107,9 +107,10 @@ class GRU:
             for t in range(self.iter):
 
                 batch = ground_truth.get_batch(self.batch_size)
-                batch[0] = np.array(batch[0]).reshape((-1, self.n_steps, self.n_input))
-                batch[1] = np.array(batch[1]).reshape((-1, self.n_steps, self.n_output))
-                batch[2] = np.array(batch[2]).reshape((-1))
+                batch[0] = np.array(batch[0]).reshape((self.batch_size, -1, self.n_input))
+                batch[1] = np.array(batch[1]).reshape((self.batch_size, -1, self.n_output))
+                batch[2] = np.array(batch[2]).reshape((self.batch_size))
+                batch = self.batch_slice(batch)
 
                 # 开始训练
                 train_step.run(feed_dict={x_input: batch[0], y_true: batch[1],
@@ -146,8 +147,50 @@ class GRU:
         self.model = model_path
         return self
 
-    def predict(self, inputs, lengths):
-        inputs = np.array(inputs).reshape((-1, self.n_steps, self.n_input))
+    def sequence_slice(self, seq, length):
+        res = []
+        for i in range(length - self.n_steps + 1):
+            res.append(np.array([seq[i:i + self.n_steps]]))
+
+        return np.concatenate(res, 0)
+
+    def batch_slice(self, batch):
+        res = [[], [], []]
+        for i in range(len(batch[0])):
+            res[0].append(self.sequence_slice(batch[0][i], batch[2][i]))
+            res[1].append(self.sequence_slice(batch[1][i], batch[2][i]))
+        res[0] = np.concatenate(res[0])
+        res[1] = np.concatenate(res[1])
+        for i in range(len(res[0])):
+            res[2].append(self.n_steps)
+        return res
+
+    def predict(self, inputs):
+        inputs = np.array(inputs)[:, -self.n_steps:].reshape((-1, self.n_steps, self.n_input))
+        tf.reset_default_graph()
+        with tf.Session() as restore_sess:
+            restore_saver = tf.train.import_meta_graph(self.model + '.meta')
+            restore_saver.restore(restore_sess, tf.train.latest_checkpoint(os.path.dirname(self.model)))
+            g = tf.get_default_graph()
+            x_input = g.get_operation_by_name("x").outputs[0]
+            seq_lens = g.get_operation_by_name("length").outputs[0]
+            keep_prob = g.get_operation_by_name("keep_prob").outputs[0]
+            output = g.get_collection("output")
+            return restore_sess.run(output, feed_dict={x_input: inputs, seq_lens: [self.n_steps], keep_prob: 1})
+
+    def predict_seq(self, sequence):
+        sequence = sequence.reshape((-1, self.n_input))
+        inputs = []
+        lengths = []
+        if len(sequence) < self.n_steps:
+            seq = np.pad(sequence, ((self.n_steps - len(sequence), 0), (0, 0)), 'constant')
+            inputs.append(seq)
+            lengths.append(self.n_steps)
+        else:
+            for i in range(self.n_steps, len(sequence) + 1):
+                inputs.append(sequence[i - 5:i])
+                lengths.append(self.n_steps)
+
         tf.reset_default_graph()
         with tf.Session() as restore_sess:
             restore_saver = tf.train.import_meta_graph(self.model + '.meta')
