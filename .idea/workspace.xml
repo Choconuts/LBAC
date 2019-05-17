@@ -1,0 +1,694 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="3330b41c-89ae-41fd-8de9-4edbf95f17a9" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/LBAC.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/interface/array_render.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/interface/display.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/interface/draw.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/interface/regressor.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/interface/virtual_fitting.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/models/config.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/models/instance.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/models/pose_gt.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/models/pose_seq_reader.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/models/shape_gt.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/models/smpl_np.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/networks/config.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/networks/gru.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/networks/gru_tst.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/networks/mlp.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/networks/mlp_tst.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/test/a.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/test/b.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/test/gl.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/test/msg.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/test/pose_gt/bth_0.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/test/pose_gt/meta.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/test/proto.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/test/tst2.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/test/tst_gt.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/test/tst_stage.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/test/tstinterface.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/utils/canvas.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/utils/closest_vertex.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/utils/gl.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/utils/graph_helper.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/utils/ground_truth.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/utils/mesh.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/utils/smooth.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app2/utils/utils.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bin/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/com/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lbac/__init__.py" afterDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CoverageDataManager">
+    <SUITE FILE_PATH="coverage/LBAC$smpl_tf.coverage" NAME="smpl_tf Coverage Results" MODIFIED="1554355983310" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/smpl" />
+    <SUITE FILE_PATH="coverage/LBAC$gru.coverage" NAME="gru Coverage Results" MODIFIED="1556462614788" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/learning" />
+    <SUITE FILE_PATH="coverage/LBAC$objects.coverage" NAME="objects Coverage Results" MODIFIED="1554184623077" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/display" />
+    <SUITE FILE_PATH="coverage/LBAC$conf_builder.coverage" NAME="conf_builder Coverage Results" MODIFIED="1554900372717" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/test/simulation" />
+    <SUITE FILE_PATH="coverage/LBAC$smooth.coverage" NAME="smooth Coverage Results" MODIFIED="1556288889696" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/geometry" />
+    <SUITE FILE_PATH="coverage/LBAC$shader.coverage" NAME="shader Coverage Results" MODIFIED="1555231690858" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/display" />
+    <SUITE FILE_PATH="coverage/LBAC$shape_display.coverage" NAME="shape_display Coverage Results" MODIFIED="1556524356898" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app2/display" />
+    <SUITE FILE_PATH="coverage/LBAC$rnn.coverage" NAME="rnn Coverage Results" MODIFIED="1555323130213" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/learning" />
+    <SUITE FILE_PATH="coverage/LBAC$mlp2.coverage" NAME="mlp2 Coverage Results" MODIFIED="1556360364702" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/learning" />
+    <SUITE FILE_PATH="coverage/LBAC$test1.coverage" NAME="test1 Coverage Results" MODIFIED="1556119417676" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/test" />
+    <SUITE FILE_PATH="coverage/LBAC$mlp.coverage" NAME="mlp Coverage Results" MODIFIED="1556361022010" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/learning" />
+    <SUITE FILE_PATH="coverage/LBAC$mesh.coverage" NAME="mesh Coverage Results" MODIFIED="1555231823037" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/easyGL" />
+    <SUITE FILE_PATH="coverage/LBAC$beta_simulation.coverage" NAME="beta_simulation Coverage Results" MODIFIED="1554388724224" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/test" />
+    <SUITE FILE_PATH="coverage/LBAC$test.coverage" NAME="test Coverage Results" MODIFIED="1554913666317" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/display" />
+    <SUITE FILE_PATH="coverage/LBAC$main.coverage" NAME="main Coverage Results" MODIFIED="1556985012750" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app2/main" />
+    <SUITE FILE_PATH="coverage/LBAC$shader_test.coverage" NAME="shader_test Coverage Results" MODIFIED="1556177646268" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/display/shader" />
+    <SUITE FILE_PATH="coverage/LBAC$closest_vertex.coverage" NAME="closest_vertex Coverage Results" MODIFIED="1556270697996" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/geometry" />
+    <SUITE FILE_PATH="coverage/LBAC$parser.coverage" NAME="parser Coverage Results" MODIFIED="1554878876277" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/cmu" />
+    <SUITE FILE_PATH="coverage/LBAC$cmu_parser.coverage" NAME="cmu_parser Coverage Results" MODIFIED="1555166604828" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/cmu" />
+    <SUITE FILE_PATH="coverage/LBAC$ground_truths.coverage" NAME="ground_truths Coverage Results" MODIFIED="1556460592931" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/learning" />
+    <SUITE FILE_PATH="coverage/LBAC$interface.coverage" NAME="interface Coverage Results" MODIFIED="1556987990389" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app2/main" />
+    <SUITE FILE_PATH="coverage/LBAC$display.coverage" NAME="display Coverage Results" MODIFIED="1555055825736" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app" />
+    <SUITE FILE_PATH="coverage/LBAC$smpl_np.coverage" NAME="smpl_np Coverage Results" MODIFIED="1555771881510" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/smpl" />
+    <SUITE FILE_PATH="coverage/LBAC$test2.coverage" NAME="test2 Coverage Results" MODIFIED="1556260674945" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/test" />
+    <SUITE FILE_PATH="coverage/LBAC$tst.coverage" NAME="tst Coverage Results" MODIFIED="1556979308707" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app2/learning" />
+    <SUITE FILE_PATH="coverage/LBAC$pytest_in_mlp_py.coverage" NAME="pytest in mlp.py Coverage Results" MODIFIED="1554907854392" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/learning" />
+    <SUITE FILE_PATH="coverage/LBAC$regressor.coverage" NAME="regressor Coverage Results" MODIFIED="1556462825621" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/learning" />
+    <SUITE FILE_PATH="coverage/LBAC$gener.coverage" NAME="gener Coverage Results" MODIFIED="1554899674371" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/test/anima" />
+    <SUITE FILE_PATH="coverage/LBAC$body_builder.coverage" NAME="body_builder Coverage Results" MODIFIED="1554356266604" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/smpl" />
+    <SUITE FILE_PATH="coverage/LBAC$ground_truth.coverage" NAME="ground_truth Coverage Results" MODIFIED="1556512178740" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app2/learning" />
+    <SUITE FILE_PATH="coverage/LBAC$tes.coverage" NAME="tes Coverage Results" MODIFIED="1556443598900" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/easyGL" />
+    <SUITE FILE_PATH="coverage/LBAC$seq_builder.coverage" NAME="seq_builder Coverage Results" MODIFIED="1555172752634" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/sequence" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>shader</find>
+      <find>glVerte</find>
+      <find>BIN</find>
+      <find>Vertex</find>
+      <find>17436</find>
+      <find>uni</find>
+      <find>At</find>
+      <find>A</find>
+      <find>g</find>
+      <find>gl</find>
+      <find>glPushMatrix</find>
+      <find>meta</find>
+    </findStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="app2" />
+      </map>
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/app/learning/mlp2.py" />
+        <option value="$PROJECT_DIR$/app/learning/gru3.py" />
+        <option value="$PROJECT_DIR$/app/network/networks.py" />
+        <option value="$PROJECT_DIR$/app/network/graph.py" />
+        <option value="$PROJECT_DIR$/app/learning/gru4.py" />
+        <option value="$PROJECT_DIR$/app/learning/tst.py" />
+        <option value="$PROJECT_DIR$/app/network/gru.py" />
+        <option value="$PROJECT_DIR$/app/main/interface.py" />
+        <option value="$PROJECT_DIR$/app/learning/regressor.py" />
+        <option value="$PROJECT_DIR$/app/network2/tst.py" />
+        <option value="$PROJECT_DIR$/app/network2/graph.py" />
+        <option value="$PROJECT_DIR$/app2/utils/smooth.py" />
+        <option value="$PROJECT_DIR$/app2/models/smpl.py" />
+        <option value="$PROJECT_DIR$/app2/test/1.py" />
+        <option value="$PROJECT_DIR$/app2/test/2.py" />
+        <option value="$PROJECT_DIR$/app2/utils/closest_vertex.py" />
+        <option value="$PROJECT_DIR$/app2/test/a.py" />
+        <option value="$PROJECT_DIR$/app2/test/b.py" />
+        <option value="$PROJECT_DIR$/app/learning/network.py" />
+        <option value="$PROJECT_DIR$/app/network/mlp.py" />
+        <option value="$PROJECT_DIR$/app2/utils/ground_truth.py" />
+        <option value="$PROJECT_DIR$/app2/networks/mlp_tst.py" />
+        <option value="$PROJECT_DIR$/app2/networks/gru_tst.py" />
+        <option value="$PROJECT_DIR$/app2/models/shape_gt.py" />
+        <option value="$PROJECT_DIR$/app2/networks/mlp.py" />
+        <option value="$PROJECT_DIR$/run.py" />
+        <option value="$PROJECT_DIR$/app2/config.py" />
+        <option value="$PROJECT_DIR$/config.py" />
+        <option value="$PROJECT_DIR$/app/sequence/builder.py" />
+        <option value="$PROJECT_DIR$/app/main/main.py" />
+        <option value="$PROJECT_DIR$/app2/utils/graph_helper.py" />
+        <option value="$PROJECT_DIR$/app2/networks/config.py" />
+        <option value="$PROJECT_DIR$/app2/networks/gru.py" />
+        <option value="$PROJECT_DIR$/app2/test/tstinterface.py" />
+        <option value="$PROJECT_DIR$/app2/models/config.py" />
+        <option value="$PROJECT_DIR$/app/main/virtual_fitting.py" />
+        <option value="$PROJECT_DIR$/app2/interface/regressor.py" />
+        <option value="$PROJECT_DIR$/app2/models/instance.py" />
+        <option value="$PROJECT_DIR$/app/main/display.py" />
+        <option value="$PROJECT_DIR$/app2/interface/draw.py" />
+        <option value="$PROJECT_DIR$/app2/test/tst_gt.py" />
+        <option value="$PROJECT_DIR$/app2/utils/mesh.py" />
+        <option value="$PROJECT_DIR$/app2/models/smpl_np.py" />
+        <option value="$PROJECT_DIR$/app2/interface/virtual_fitting.py" />
+        <option value="$PROJECT_DIR$/app2/interface/display.py" />
+        <option value="$PROJECT_DIR$/app2/test/tstflag.py" />
+        <option value="$PROJECT_DIR$/app2/test/GT.py" />
+        <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/app2/models/pose_gt.py" />
+        <option value="$PROJECT_DIR$/app2/test/tst_stage.py" />
+        <option value="$PROJECT_DIR$/app2/utils/canvas.py" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="ProjectFrameBounds" fullScreen="true">
+    <option name="width" value="1680" />
+    <option name="height" value="1050" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State />
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>Angular</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scope">
+        <subPane subId="Scope 'Project Files'; set:Project Files; class com.intellij.psi.search.scope.ProjectFilesScope">
+          <expand>
+            <path>
+              <item name="LBAC" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
+              <item name="~/Desktop/edu/CAD/project/LBAC" type="442cc68d:ScopeViewTreeModel$RootNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="LBAC" type="b2602c69:ProjectViewProjectNode" />
+              <item name="LBAC" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="LBAC" type="b2602c69:ProjectViewProjectNode" />
+              <item name="LBAC" type="462c0819:PsiDirectoryNode" />
+              <item name="app2" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="LBAC" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Scratches and Consoles" type="1a2a3e82:ScratchProjectViewPane$MyProjectNode" />
+            </path>
+            <path>
+              <item name="LBAC" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Scratches and Consoles" type="1a2a3e82:ScratchProjectViewPane$MyProjectNode" />
+              <item name="Extensions" type="d62648e6:ScratchProjectViewPane$MyRootNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/app2/utils" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/app2/utils" />
+      <recent name="$PROJECT_DIR$/app2/interface" />
+      <recent name="$PROJECT_DIR$/app2/data/net/gru" />
+      <recent name="$PROJECT_DIR$/app2/data" />
+      <recent name="$PROJECT_DIR$/app2/networks" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/app2/main/tmp" />
+      <recent name="$PROJECT_DIR$/app2/main" />
+      <recent name="$PROJECT_DIR$/app2/main_1" />
+      <recent name="$PROJECT_DIR$/app2" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="Python.GT">
+    <configuration name="GT" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="LBAC" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/app2/test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/app2/test/GT.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="display (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="LBAC" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/app2/interface" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/app2/interface/display.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="mesh" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="LBAC" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/app2/utils" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/app2/utils/mesh.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="tstflag" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="LBAC" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/app2/test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/app2/test/tstflag.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.mesh" />
+      <item itemvalue="Python.display (1)" />
+      <item itemvalue="Python.tstflag" />
+      <item itemvalue="Python.GT" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.GT" />
+        <item itemvalue="Python.tstflag" />
+        <item itemvalue="Python.display (1)" />
+        <item itemvalue="Python.mesh" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="3330b41c-89ae-41fd-8de9-4edbf95f17a9" name="Default Changelist" comment="" />
+      <created>1554179685814</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1554179685814</updated>
+    </task>
+    <task id="LOCAL-00001" summary="create">
+      <created>1554640237015</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1554640237015</updated>
+    </task>
+    <task id="LOCAL-00002" summary="create">
+      <created>1554736544559</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1554736544559</updated>
+    </task>
+    <task id="LOCAL-00003" summary="fixed holes bug">
+      <created>1554906266806</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1554906266806</updated>
+    </task>
+    <task id="LOCAL-00004" summary="sequence">
+      <created>1555226307442</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1555226307442</updated>
+    </task>
+    <task id="LOCAL-00005" summary="display">
+      <created>1556284643183</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1556284643183</updated>
+    </task>
+    <task id="LOCAL-00006" summary="display">
+      <created>1556410673856</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1556410673856</updated>
+    </task>
+    <task id="LOCAL-00007" summary="all">
+      <created>1556454069615</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1556454069615</updated>
+    </task>
+    <task id="LOCAL-00008" summary="all">
+      <created>1556512854412</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1556512854412</updated>
+    </task>
+    <task id="LOCAL-00009" summary="all">
+      <created>1556513604212</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1556513604212</updated>
+    </task>
+    <task id="LOCAL-00010" summary="all">
+      <created>1556513884313</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1556513884313</updated>
+    </task>
+    <task id="LOCAL-00011" summary="all">
+      <created>1556554110895</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1556554110895</updated>
+    </task>
+    <task id="LOCAL-00012" summary="all">
+      <created>1556555512783</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1556555512783</updated>
+    </task>
+    <task id="LOCAL-00013" summary="all">
+      <created>1556598688419</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1556598688419</updated>
+    </task>
+    <task id="LOCAL-00014" summary="all">
+      <created>1557119570732</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1557119570732</updated>
+    </task>
+    <task id="LOCAL-00015" summary="all">
+      <created>1557120145175</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1557120145175</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
+    <servers />
+  </component>
+  <component name="TestHistory">
+    <history-entry file="pytest_in_mlp_py - 2019.04.10 at 22h 49m 16s.xml">
+      <configuration name="pytest in mlp.py" configurationId="tests" />
+    </history-entry>
+    <history-entry file="pytest_in_mlp_py - 2019.04.10 at 22h 49m 36s.xml">
+      <configuration name="pytest in mlp.py" configurationId="tests" />
+    </history-entry>
+  </component>
+  <component name="TodoView" selected-index="4">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
+    <layout>
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.27245328" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32959184" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32857144" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32959184" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="8" sideWeight="0.4993895" weight="0.32959184" />
+      <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50061053" side_tool="true" weight="0.32959184" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="11" visible="true" weight="0.31428573" />
+      <window_info anchor="bottom" id="Python Console" order="12" weight="0.32959184" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="SciView" order="3" weight="0.32967034" />
+      <window_info anchor="right" id="Database" order="4" />
+    </layout>
+    <layout-to-restore>
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.27787825" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32959184" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.32857144" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32959184" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="8" sideWeight="0.4993895" weight="0.32959184" />
+      <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50061053" side_tool="true" weight="0.32959184" />
+      <window_info anchor="bottom" id="Terminal" order="11" weight="0.32959184" />
+      <window_info anchor="bottom" id="Python Console" order="12" weight="0.32959184" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="SciView" order="3" weight="0.32967034" />
+      <window_info anchor="right" id="Database" order="4" />
+    </layout-to-restore>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="create" />
+    <MESSAGE value="fixed holes bug" />
+    <MESSAGE value="sequence" />
+    <MESSAGE value="display" />
+    <MESSAGE value="all" />
+    <option name="LAST_COMMIT_MESSAGE" value="all" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/codecs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="179">
+          <caret line="308" selection-start-line="308" selection-end-line="308" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/random.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="220" selection-start-line="220" selection-end-line="220" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="17" selection-start-line="17" selection-end-line="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/geometry/mesh.py" />
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="433">
+          <caret line="1740" selection-start-line="1740" selection-end-line="1740" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app2/models/shape_gt.py" />
+    <entry file="file://$PROJECT_DIR$/app2/utils/smooth.py" />
+    <entry file="file://$PROJECT_DIR$/app2/utils/ground_truth.py" />
+    <entry file="file://$PROJECT_DIR$/app2/utils/gl.py" />
+    <entry file="file://$PROJECT_DIR$/app2/test/b.py" />
+    <entry file="file://$PROJECT_DIR$/app/network2/graph.py" />
+    <entry file="file://$PROJECT_DIR$/config.py" />
+    <entry file="file://$PROJECT_DIR$/app/sequence/builder.py" />
+    <entry file="file://$PROJECT_DIR$/app/main/main.py" />
+    <entry file="file://$PROJECT_DIR$/app/sequence/cmu.py" />
+    <entry file="file://$PROJECT_DIR$/app2/data/net/gru/2/checkpoint" />
+    <entry file="file://$PROJECT_DIR$/app/learning/regressor.py" />
+    <entry file="file://$PROJECT_DIR$/app2/networks/mlp_tst.py" />
+    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/posixpath.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="186">
+          <caret line="79" selection-start-line="79" selection-end-line="79" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/tensorflow/python/training/saver.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="186">
+          <caret line="1672" selection-start-line="1672" selection-end-line="1672" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app2/utils/closest_vertex.py" />
+    <entry file="file://$PROJECT_DIR$/app2/data/net/gru/4/checkpoint" />
+    <entry file="file://$PROJECT_DIR$/app2/networks/config.py" />
+    <entry file="file://$PROJECT_DIR$/app/display/utils.py" />
+    <entry file="file://$PROJECT_DIR$/app2/models/config.py" />
+    <entry file="file://$PROJECT_DIR$/app2/test/tstinterface.py" />
+    <entry file="file://$PROJECT_DIR$/app2/models/instance.py" />
+    <entry file="file://$PROJECT_DIR$/app/main/interface.py" />
+    <entry file="file://$PROJECT_DIR$/app2/utils/mesh.py" />
+    <entry file="file://$PROJECT_DIR$/app/main/virtual_fitting.py" />
+    <entry file="file://$PROJECT_DIR$/app2/interface/regressor.py" />
+    <entry file="file://$PROJECT_DIR$/app2/test/tst_gt.py" />
+    <entry file="file://$PROJECT_DIR$/app/main/display.py" />
+    <entry file="file://$PROJECT_DIR$/app/display/shader/shaders.py" />
+    <entry file="file://$PROJECT_DIR$/app2/interface/draw.py" />
+    <entry file="file://$PROJECT_DIR$/app2/models/smpl_np.py" />
+    <entry file="file://$PROJECT_DIR$/app2/interface/display.py" />
+    <entry file="file://$PROJECT_DIR$/app2/interface/virtual_fitting.py" />
+    <entry file="file://$PROJECT_DIR$/app2/networks/mlp.py" />
+    <entry file="file://$PROJECT_DIR$/app2/networks/gru_tst.py" />
+    <entry file="file://$PROJECT_DIR$/app2/utils/graph_helper.py" />
+    <entry file="file://$PROJECT_DIR$/app2/networks/gru.py" />
+    <entry file="file://$PROJECT_DIR$/run.py" />
+    <entry file="file://$PROJECT_DIR$/main.py" />
+    <entry file="file://$PROJECT_DIR$/app2/models/pose_gt.py" />
+    <entry file="file://$PROJECT_DIR$/app2/interface/array_render.py" />
+    <entry file="file://$PROJECT_DIR$/app2/utils/utils.py" />
+    <entry file="file://$PROJECT_DIR$/app2/utils/canvas.py" />
+    <entry file="file://$PROJECT_DIR$/app2/test/tstflag.py" />
+    <entry file="file://$PROJECT_DIR$/app2/test/GT.py" />
+    <entry file="file://$PROJECT_DIR$/app2/test/tst_stage.py" />
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ScopeChooserConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>
