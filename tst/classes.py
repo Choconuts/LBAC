@@ -2,7 +2,7 @@ import os, json
 
 
 class A:
-    a = 0
+    a = 2
 
     def log(self):
         print(self.a)
