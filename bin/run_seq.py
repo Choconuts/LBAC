@@ -7,9 +7,10 @@ from com.path_helper import *
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string('out', conf_path('seqs'), 'sequence out put dir, relative to db')
+
+flags.DEFINE_string('in', conf_path('seqs'), 'sequence out put dir, relative to db')
+flags.DEFINE_string('out', conf_path('sim'), 'sim dir')
 flags.DEFINE_string('dir', 'dd', 'r(relative) a(absolute), or d(relative to db), default d, in-out-ex')
-flags.DEFINE_string('in', conf_path('seq_poses_json'), 'input poses json file, list of sequences')
 flags.DEFINE_integer('lerp', 20, 'interpolate frames num')
 flags.DEFINE_integer('shape', 1, 'the first one, or first 17 shapes')
 flags.DEFINE_string('type', 's', 'shape or pose, or other')
@@ -23,7 +24,7 @@ def get_dir(key, i):
     if i >= len(FLAGS.dir):
         i = len(FLAGS.dir) - 1
     if FLAGS.dir[i] == 'd':
-        m_dir = os.path.join(conf_value('db'), out_dir)
+        m_dir = os.path.join(get_base('db'), out_dir)
     return m_dir
 
 
@@ -35,7 +36,7 @@ def main(argv):
     in_dir = get_dir('in', 1)
 
     if FLAGS.dir[0] == 'd':
-        out_dir = os.path.join(conf_value('db'), out_dir)
+        out_dir = os.path.join(get_base('db'), out_dir)
 
     if FLAGS.type == 's':
         set_smpl(SMPLModel(conf_path('smpl')))

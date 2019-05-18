@@ -13,9 +13,7 @@ def find_dir_upwards(dir_name, iter=5):
 
 def conf_path(key, base="db"):
     path = conf_value(key)
-    base_dir = conf_value(base)
-    if base_dir is None:
-        base_dir = find_dir_upwards(base, 5)
+    base_dir = get_base(base)
     if path is not None:
         path = os.path.join(base_dir, path)
         return path
@@ -46,6 +44,13 @@ def str5(i):
     if i > 99999:
         print("Warning: index overflowed")
     return '%05d' % i
+
+
+def get_base(key):
+    base_dir = conf_value(key)
+    if base_dir is None:
+        base_dir = find_dir_upwards(key, 5)
+    return base_dir
 
 
 conf_json = os.path.join(find_dir_upwards('conf'), configure)

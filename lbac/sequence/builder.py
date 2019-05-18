@@ -26,7 +26,7 @@ def build_sequence(seq_dir, betas, poses=None, transforms=None):
         if not os.removedirs(seq_dir):
             print('dir exists!')
             return
-    os.mkdir(seq_dir)
+    os.makedirs(seq_dir)
     if poses is None:
         poses = np.zeros((len(betas), 24, 3))
     for i in range(len(poses)):
@@ -71,7 +71,7 @@ def shape_sequences(base_dir, shapes, frame=5):
     :return:
     """
     if not os.path.exists(base_dir):
-        os.mkdir(base_dir)
+        os.makedirs(base_dir)
     for i in range(len(shapes)):
         beta4 =  np.array(shapes[i])
         if len(beta4) < 10:
