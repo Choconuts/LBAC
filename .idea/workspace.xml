@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="3330b41c-89ae-41fd-8de9-4edbf95f17a9" name="Default Changelist" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/com/path_helper.py" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/lbac/sequence/builder.py" />
-      <change beforePath="$PROJECT_DIR$/.idea/LBAC.iml" afterPath="$PROJECT_DIR$/.idea/LBAC.iml" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+    <list default="true" id="3330b41c-89ae-41fd-8de9-4edbf95f17a9" name="Default Changelist" comment="Default Changelist">
+      <change beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/conf/mac.json" afterPath="" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -65,7 +61,7 @@
       <file leaf-file-name="builder.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/lbac/sequence/builder.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="640">
+            <state relative-caret-position="3523">
               <caret line="154" column="32" lean-forward="false" selection-start-line="154" selection-start-column="23" selection-end-line="154" selection-end-column="32" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
@@ -120,7 +116,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/app/learning/tst.py" />
         <option value="$PROJECT_DIR$/app/network/gru.py" />
         <option value="$PROJECT_DIR$/app/main/interface.py" />
         <option value="$PROJECT_DIR$/app/learning/regressor.py" />
@@ -171,6 +166,7 @@
         <option value="$PROJECT_DIR$/com/path_helper.py" />
         <option value="$PROJECT_DIR$/conf/win.json" />
         <option value="$PROJECT_DIR$/lbac/sequence/builder.py" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -247,43 +243,6 @@
               <item name="LBAC" type="b2602c69:ProjectViewProjectNode" />
               <item name="LBAC" type="462c0819:PsiDirectoryNode" />
               <item name="conf" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="LBAC" type="b2602c69:ProjectViewProjectNode" />
-              <item name="LBAC" type="462c0819:PsiDirectoryNode" />
-              <item name="db" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="LBAC" type="b2602c69:ProjectViewProjectNode" />
-              <item name="LBAC" type="462c0819:PsiDirectoryNode" />
-              <item name="db" type="462c0819:PsiDirectoryNode" />
-              <item name="model" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="LBAC" type="b2602c69:ProjectViewProjectNode" />
-              <item name="LBAC" type="462c0819:PsiDirectoryNode" />
-              <item name="db" type="462c0819:PsiDirectoryNode" />
-              <item name="raw" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="LBAC" type="b2602c69:ProjectViewProjectNode" />
-              <item name="LBAC" type="462c0819:PsiDirectoryNode" />
-              <item name="db" type="462c0819:PsiDirectoryNode" />
-              <item name="raw" type="462c0819:PsiDirectoryNode" />
-              <item name="shape" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="LBAC" type="b2602c69:ProjectViewProjectNode" />
-              <item name="LBAC" type="462c0819:PsiDirectoryNode" />
-              <item name="db" type="462c0819:PsiDirectoryNode" />
-              <item name="temp" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="LBAC" type="b2602c69:ProjectViewProjectNode" />
-              <item name="LBAC" type="462c0819:PsiDirectoryNode" />
-              <item name="db" type="462c0819:PsiDirectoryNode" />
-              <item name="temp" type="462c0819:PsiDirectoryNode" />
-              <item name="shape" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="LBAC" type="b2602c69:ProjectViewProjectNode" />
@@ -577,7 +536,14 @@
       <option name="project" value="LOCAL" />
       <updated>1557120145175</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Default Changelist">
+      <created>1558141977852</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1558141977852</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -631,7 +597,8 @@
     <MESSAGE value="sequence" />
     <MESSAGE value="display" />
     <MESSAGE value="all" />
-    <option name="LAST_COMMIT_MESSAGE" value="all" />
+    <MESSAGE value="Default Changelist" />
+    <option name="LAST_COMMIT_MESSAGE" value="Default Changelist" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -693,14 +660,6 @@
     <entry file="file://$PROJECT_DIR$/app2/test/tstflag.py" />
     <entry file="file://$PROJECT_DIR$/app2/test/GT.py" />
     <entry file="file://$PROJECT_DIR$/app2/test/tst_stage.py" />
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/db/raw/shape/17_betas.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -725,9 +684,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="115">
+          <caret line="5" column="5" lean-forward="false" selection-start-line="5" selection-start-column="5" selection-end-line="5" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/lbac/sequence/builder.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="640">
+        <state relative-caret-position="3523">
           <caret line="154" column="32" lean-forward="false" selection-start-line="154" selection-start-column="23" selection-end-line="154" selection-end-column="32" />
           <folding>
             <element signature="e#0#27#0" expanded="true" />
