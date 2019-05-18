@@ -292,18 +292,6 @@ class VertexArray:
         return self.va.flatten()
 
 
-def gen_mesh_array(mesh: Mesh, color):
-    verts = mesh.vertices
-    norms = mesh.normal
-    colors = np.broadcast_to(color, verts.shape)
-    return np.hstack((verts, norms, colors)).astype('f')
-
-
-def gen_mesh_element_array(mesh: Mesh):
-    faces = mesh.faces
-    return np.array(faces, 'i')
-
-
 if __name__ == '__main__':
     """
     """
@@ -322,6 +310,4 @@ if __name__ == '__main__':
     # process_pool(100)
 
     m = Mesh().load('../data/betas/template.obj')
-    gen_mesh_array(m, [0, 1, 2])
-    print(gen_mesh_element_array(m))
 

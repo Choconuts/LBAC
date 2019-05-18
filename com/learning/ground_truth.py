@@ -7,7 +7,7 @@ class GroundTruth:
     def get_batch(self, size):
         return [[0], [0]]
 
-    def get_test(self, size):
+    def get_test(self):
         return [[0], [0]]
 
     def load(self, gt_file):
@@ -35,8 +35,3 @@ def duplicate(arrays, n_row):
         b[j] = np.concatenate(b[j], 0)
 
     return b
-
-
-def array(batch):
-    for i in range(len(batch)):
-        batch[i] = np.array(batch[i])

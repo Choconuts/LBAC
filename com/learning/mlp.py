@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from graph_helper import Graph
+from com.learning.graph_helper import Graph
 
 
 n_input = 10
@@ -59,6 +59,11 @@ def graph():
     return [train_step], [x_input, keep_prob, y_true], None, cross_entropy, output
 
 
+def array(batch):
+    for i in range(len(batch)):
+        batch[i] = np.array(batch[i])
+
+
 def batch_process(batch: list, is_train, local_step):
     if is_train:
         batch.insert(1, keep_probability)
@@ -76,10 +81,18 @@ def predict_process(batch: list, is_test):
     return batch[0:3]
 
 
+class MLPGraph(Graph):
+    def __init__(self):
+        Graph.__init__(self, graph_id)
+        self.batch_process = batch_process
+        self.show_steps = show_step
+        self.iter = iter
+        self.batch_size = batch_size
+        self.graph_func = graph
 
 
 
 if __name__ == '__main__':
-    from app2.models.instance import beta_gt
-    train(beta_gt)
+    """
+    """
 

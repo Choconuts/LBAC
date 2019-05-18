@@ -31,8 +31,8 @@ class Graph:
 
     # 外部方法
 
-    def generate(self, graph_func):
-        g = graph_func()
+    def generate(self):
+        g = self.graph_func()
         for i in range(len(g)):
             setattr(self, self.interfaces[i], self.collect(g[i], self.interfaces[i]))
         return self
@@ -66,6 +66,9 @@ class Graph:
             self.save_graph = saving
 
     # 需要重写/外部修改的方法
+
+    def graph_func(self):
+        return sample_graph()
 
     def batch_process(self, raw_batch, is_train, local_step):
         return raw_batch
@@ -101,6 +104,7 @@ class Graph:
     def train_step(self, sess, batch, step):
         feed_dict = self.pack(self.batch_process(batch, True, step))
         if feed_dict is None:
+            print('train failes')
             return
         for t in self.trainers:
             sess.run(t, feed_dict=feed_dict)
@@ -108,6 +112,7 @@ class Graph:
     def eval_step(self, sess, batch, step):
         feed_dict = self.pack(self.batch_process(batch, False, step))
         if feed_dict is None:
+            print('eval failed')
             return
         for e in self.evaluates:
             ev = sess.run(e, feed_dict=feed_dict)
@@ -116,6 +121,7 @@ class Graph:
     def test_step(self, sess, batch, step):
         feed_dict = self.pack(self.predict_process(batch, True))
         if feed_dict is None:
+            print('tst failed')
             return
         for e in self.evaluates:
             sess.run(e, feed_dict=feed_dict)
@@ -147,6 +153,7 @@ class Graph:
         if batch is None or len(batch) == 0:
             return None
         feed = dict()
+
         for i in range(len(batch)):
             if batch[i] is None:
                 continue
@@ -154,12 +161,12 @@ class Graph:
         return feed
 
 
-# def sample_graph():
-#     x = tf.placeholder(shape=(None, 1), dtype=tf.float32, name='x')
-#     y = tf.placeholder(shape=(None, 1), dtype=tf.float32, name='y')
-#
-#     o = tf.contrib.layers.fully_connected(inputs=x, num_outputs=1, activation_fn=None)
-#     c = tf.reduce_mean(tf.square(o - y))
-#     t = tf.train.AdamOptimizer(1e-2).minimize(c)
-#
-#     return t, [x, y], None, c, o
+def sample_graph():
+    x = tf.placeholder(shape=(None, 1), dtype=tf.float32, name='x')
+    y = tf.placeholder(shape=(None, 1), dtype=tf.float32, name='y')
+
+    o = tf.contrib.layers.fully_connected(inputs=x, num_outputs=1, activation_fn=None)
+    c = tf.reduce_mean(tf.square(o - y))
+    t = tf.train.AdamOptimizer(1e-2).minimize(c)
+
+    return t, [x, y], None, c, o

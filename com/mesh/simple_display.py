@@ -5,9 +5,6 @@ from OpenGL.GLUT import *
 from OpenGL.arrays import vbo
 import numpy as np
 import time as time
-from com.mesh.mesh import Mesh
-from app2.interface.array_renderer import *
-
 
 
 class View:
