@@ -57,6 +57,9 @@ def get_base(key):
     return base_dir
 
 
+join = os.path.join
+exists = os.path.exists
+
 conf_json = os.path.join(find_dir_upwards('conf'), configure)
 
 

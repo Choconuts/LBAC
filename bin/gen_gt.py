@@ -1,19 +1,16 @@
 from absl import app
 from absl import flags
 import os
-from lbac.sequence.simulation import *
 from com.path_helper import *
-
 
 FLAGS = flags.FLAGS
 
-
-flags.DEFINE_string('in', conf_path('seqs'), 'sequence out put dir, relative to db')
-flags.DEFINE_string('sim', conf_path('sim'), 'sim dir')
-flags.DEFINE_string('out', conf_path('extract'), 'data extracted, both meta and meshes')
+flags.DEFINE_string('in', conf_path('sim'), 'simulation out put dir, relative to db')
+flags.DEFINE_string('seq', conf_path('seqs'), 'sequence out put dir, relative to db')
+flags.DEFINE_string('ext', conf_path('extract'), 'extracted data dir')
+flags.DEFINE_string('out', conf_path('gt'), 'ground truth dir')
 flags.DEFINE_string('dir', 'dd', 'r(relative) a(absolute), or d(relative to db), default d, in-out-ex')
 flags.DEFINE_string('mesh', None, 'path to cloth mesh')
-flags.DEFINE_string('type', 'pose', 'simulation type')
 flags.DEFINE_integer('s', 0, 'start index')
 flags.DEFINE_integer('e', -1, 'end index')
 flags.DEFINE_integer('m', 1, 'end index')
@@ -34,25 +31,22 @@ def get_dir(key, i):
 def main(argv):
     del argv
 
-    out_dir = get_dir('out', 2)
-    sim_dir = get_dir('sim', 1)
+    out_dir = get_dir('out', 1)
     in_dir = get_dir('in', 0)
     cloth_id = getattr(FLAGS, 'cloth')
     start = getattr(FLAGS, 's')
     end = getattr(FLAGS, 'e')
     mode = getattr(FLAGS, 'm')
-    sim_type = getattr(FLAGS, 'type')
 
     if FLAGS.dir[0] == 'd':
-        sim_dir = os.path.join(get_base('db'), sim_dir)
+        out_dir = os.path.join(get_base('db'), out_dir)
     seq_reader = SeqReader(in_dir)
     if end < 0:
         end = seq_reader.seq_num
-    res = simulate(seq_reader, sim_dir, cloth_id, range(start, end), mode)
-    if res:
-        extract_results(out_dir, sim_type)
+    simulate(seq_reader, out_dir, cloth_id, range(start, end), mode)
 
 
 if __name__ == '__main__':
     app.run(main)
+
 

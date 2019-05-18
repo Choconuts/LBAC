@@ -2,7 +2,8 @@ import json
 import os
 import copy
 from com.path_helper import *
-from lbac.sequence.reader import SeqReader
+from lbac.sequence.reader import SeqReader, SimExtractor
+import time
 
 template_file = conf_path('arcsim_conf_template')
 arcsim_exe = conf_path('arcsim')
@@ -14,6 +15,8 @@ m_cloth_id = 0
 m_out_dir = ''
 m_sim_type = 1
 m_seq_reader = None
+m_sim_range = []
+m_sim_time = 0
 
 
 def cloth_mesh():
@@ -67,19 +70,36 @@ def run_seq(i, option):
 
 
 def simulate(seq_reader: SeqReader, out_dir, cloth_id, sim_range, sim_mode=1, option=None):
-    global m_out_dir, m_cloth_id, m_sim_type, m_seq_reader
+    global m_out_dir, m_cloth_id, m_sim_type, m_seq_reader, m_sim_range
     m_out_dir = out_dir
     m_cloth_id = cloth_id
     m_sim_type = sim_mode
     m_seq_reader = seq_reader
+    m_sim_range = []
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
 
     if option is None:
         option = {}
+
+    m_sim_time = time.time()
     for i in sim_range:
+        m_sim_range.append(i)
         run_seq(i, option)
 
+    # 秒为单位
+    m_sim_time = time.time() - m_sim_time
+    return True
+
+
+def extract_results(extract_dir, sim_type):
+    config = dict()
+    config['cloth'] = m_cloth_id
+    config['sim_range'] = m_sim_range
+    config['type'] = sim_type
+    config['time'] = m_sim_time
+    extractor = SimExtractor(m_out_dir, m_seq_reader, config)
+    extractor.extract(extract_dir)
 
 
 if __name__ == '__main__':
