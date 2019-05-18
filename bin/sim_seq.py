@@ -16,7 +16,7 @@ flags.DEFINE_string('mesh', None, 'path to cloth mesh')
 flags.DEFINE_string('type', 'pose', 'simulation type')
 flags.DEFINE_integer('s', 0, 'start index')
 flags.DEFINE_integer('e', -1, 'end index')
-flags.DEFINE_integer('m', 1, 'end index')
+flags.DEFINE_integer('m', 1, 'mode, 0 for display, 1 for offline')
 flags.DEFINE_integer('cloth', 0, 'cloth id in robe')
 
 

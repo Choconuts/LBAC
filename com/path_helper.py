@@ -63,6 +63,17 @@ exists = os.path.exists
 conf_json = os.path.join(find_dir_upwards('conf'), configure)
 
 
+def load_json(file):
+    with open(file, 'r') as fp:
+        obj = json.load(fp)
+    return obj
+
+
+def save_json(obj, file):
+    with open(file, 'w') as fp:
+        json.dump(obj, fp)
+
+
 if __name__ == '__main__':
     print(conf_json)
     print(conf_path('betas'))

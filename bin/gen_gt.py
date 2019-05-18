@@ -2,19 +2,19 @@ from absl import app
 from absl import flags
 import os
 from com.path_helper import *
+from lbac.train.shape_gt import gen_beta_gt_data, set_smooth_times
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string('in', conf_path('sim'), 'simulation out put dir, relative to db')
-flags.DEFINE_string('seq', conf_path('seqs'), 'sequence out put dir, relative to db')
-flags.DEFINE_string('ext', conf_path('extract'), 'extracted data dir')
+flags.DEFINE_string('in', conf_path('extract'), 'simulation out put dir, relative to db')
 flags.DEFINE_string('out', conf_path('gt'), 'ground truth dir')
 flags.DEFINE_string('dir', 'dd', 'r(relative) a(absolute), or d(relative to db), default d, in-out-ex')
-flags.DEFINE_string('mesh', None, 'path to cloth mesh')
-flags.DEFINE_integer('s', 0, 'start index')
-flags.DEFINE_integer('e', -1, 'end index')
-flags.DEFINE_integer('m', 1, 'end index')
-flags.DEFINE_integer('cloth', 0, 'cloth id in robe')
+
+flags.DEFINE_integer('smooth', -1, 'gen default')
+
+flags.DEFINE_string('m', 's', 'gen default')
+flags.DEFINE_bool('s', False, 'gen shape')
+flags.DEFINE_bool('p', False, 'gen shape')
 
 
 def get_dir(key, i):
@@ -33,17 +33,16 @@ def main(argv):
 
     out_dir = get_dir('out', 1)
     in_dir = get_dir('in', 0)
-    cloth_id = getattr(FLAGS, 'cloth')
-    start = getattr(FLAGS, 's')
-    end = getattr(FLAGS, 'e')
-    mode = getattr(FLAGS, 'm')
 
-    if FLAGS.dir[0] == 'd':
-        out_dir = os.path.join(get_base('db'), out_dir)
-    seq_reader = SeqReader(in_dir)
-    if end < 0:
-        end = seq_reader.seq_num
-    simulate(seq_reader, out_dir, cloth_id, range(start, end), mode)
+    shape_flag = getattr(FLAGS, 's')
+    pose_flag = getattr(FLAGS, 'p')
+    mode = getattr(FLAGS, 'm')
+    smooth_factor = getattr(FLAGS, 'smooth')
+    if smooth_factor >= 0:
+        set_smooth_times(smooth_factor)
+
+    if shape_flag:
+        gen_beta_gt_data(in_dir, out_dir)
 
 
 if __name__ == '__main__':
