@@ -7,8 +7,10 @@ import itertools
 
 smpl = None
 
+no_log = False
 
 def set_smpl(smpl_model):
+    global smpl
     smpl = smpl_model
 
 
@@ -22,11 +24,8 @@ def build_sequence(seq_dir, betas, poses=None, transforms=None):
     :param transforms: 通常为0
     :return:
     """
-    if os.path.exists(seq_dir):
-        if not os.removedirs(seq_dir):
-            print('dir exists!')
-            return
-    os.makedirs(seq_dir)
+    if not os.path.exists(seq_dir):
+        os.makedirs(seq_dir)
     if poses is None:
         poses = np.zeros((len(betas), 24, 3))
     for i in range(len(poses)):
@@ -38,14 +37,30 @@ def build_sequence(seq_dir, betas, poses=None, transforms=None):
             smpl.set_params(beta=beta, pose=poses[i], trans=transforms[i])
         else:
             smpl.set_params(beta=beta, pose=poses[i])
-        mesh = smpl.get_mesh()
+        mesh = Mesh().from_vertices(smpl.verts, smpl.faces, True)
         mesh.save(os.path.join(seq_dir, str4(i) + '.obj'))
-    with open(os.path.join(seq_dir, 'meta.json'), 'r+') as fp:
-        obj = json.load(fp)
-        obj['poses'] = poses.tolist()
-        obj['betas'] = betas.tolist()
-        obj['beta'] = np.array(betas[-1]).tolist()[0:4]
+
+    meta_file = os.path.join(seq_dir, 'meta.json')
+    if os.path.exists(meta_file):
+        try:
+            with open(meta_file, 'r') as fp:
+                obj = json.load(fp)
+        except Exception as e:
+            if not no_log:
+                print(e)
+            obj = {}
+    else:
+        obj = {}
+    obj['frames'] = len(poses)
+    obj['interp'] = len(betas) - 1
+    obj['poses'] = poses.tolist()
+    obj['betas'] = betas.tolist()
+    obj['beta'] = np.array(betas[-1]).tolist()[0:4]
+    with open(meta_file, 'w') as fp:
         json.dump(obj, fp)
+
+    if not no_log:
+        print('sequence built in ' + seq_dir)
 
 
 def interpolate_param(param1, param2, frame_num):
@@ -81,13 +96,13 @@ def shape_sequences(base_dir, shapes, frame=5):
         build_sequence(seq_dir, betas)
 
 
-def build_17_betas_sequence(out_dir):
+def build_17_betas_sequence(out_dir, interp=5):
     with open(conf_path("betas"), 'r') as fp:
         obj = json.load(fp)
     betas = []
     for i in range(17):
         betas.append(obj[i])
-    shape_sequences(out_dir, betas)
+    shape_sequences(out_dir, betas, interp)
 
 
 def pose_sequences(base_dir, beta_pose_pairs):

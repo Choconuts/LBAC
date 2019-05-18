@@ -4,8 +4,12 @@ import json, os
 configure = 'win.json'
 
 
+def default_path():
+    return conf_path('temp')
+
+
 def find_dir_upwards(dir_name, iter=5):
-    if os.path.exists(dir_name):
+    if os.path.exists(dir_name) or iter < 0:
         return dir_name
     else:
         return find_dir_upwards(os.path.join('..', dir_name), iter - 1)

@@ -80,7 +80,6 @@ class SMPLModel():
             self.update()
         if no_return:
             return
-        return self.get_mesh()
 
     def update_R_and_G(self):
         # rotation matrix for each joint
