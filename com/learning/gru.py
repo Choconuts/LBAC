@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from graph_helper import Graph
+from com.learning.graph_helper import Graph
 
 
 n_input = 10                # RNN 单元输入节点的个数
@@ -138,6 +138,13 @@ def bind(g: Graph):
     g.show_steps = show_step
     g.iter = iter
     g.batch_size = batch_size
+
+
+class GRUGraph(Graph):
+    def __init__(self):
+        Graph.__init__(self, graph_id)
+        bind(self)
+        self.graph_func = graph
 
 
 if __name__ == '__main__':

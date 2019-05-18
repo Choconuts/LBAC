@@ -1,5 +1,5 @@
 import numpy as np
-from mesh import Mesh, OBJ
+from com.mesh.mesh import Mesh, OBJ
 
 
 def find_neighbors(edges, v, r, neighbors):
@@ -125,7 +125,7 @@ if __name__ == '__main__':
     m = Mesh().load('../data/pose_simulation/tst/shape_y_final/5.obj')
     smooth_hcl(m, 50)
     # expand(m, 1.03)
-    m.save('../test/save_mesh.obj')
+    m.save('../tst/save_mesh.obj')
 
 
 def smooth_bounds(mesh, times):
