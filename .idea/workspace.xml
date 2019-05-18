@@ -232,24 +232,6 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.smpl_np">
-    <list>
-      <item itemvalue="Python.GT" />
-      <item itemvalue="Python.array_render" />
-      <item itemvalue="Python.main" />
-      <item itemvalue="Python.module" />
-      <item itemvalue="Python.smpl_np" />
-    </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Python.smpl_np" />
-        <item itemvalue="Python.main" />
-        <item itemvalue="Python.array_render" />
-        <item itemvalue="Python.module" />
-        <item itemvalue="Python.GT" />
-      </list>
-    </recent_temporary>
-  </component>
   <component name="SvnConfiguration">
     <configuration />
   </component>
