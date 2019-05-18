@@ -1,14 +1,25 @@
 import json, os
 
-conf_json = '..\\..\\conf\\win.json'
+
+configure = 'win.json'
+
+
+def find_dir_upwards(dir_name, iter=5):
+    if os.path.exists(dir_name):
+        return dir_name
+    else:
+        return find_dir_upwards(os.path.join('..', dir_name), iter - 1)
 
 
 def conf_path(key, base="db"):
     path = conf_value(key)
-    if path is None:
-        path = os.path.join(conf_value(base), conf_value(key + '_r'))
+    base_dir = conf_value(base)
+    if base_dir is None:
+        base_dir = find_dir_upwards(base, 5)
+    if path is not None:
+        path = os.path.join(base_dir, path)
         return path
-    return path
+    return conf_value(key + '_a')
 
 
 def conf_value(key):
@@ -37,5 +48,9 @@ def str5(i):
     return '%05d' % i
 
 
+conf_json = os.path.join(find_dir_upwards('conf'), configure)
+
+
 if __name__ == '__main__':
-    print(conf_path("betas_17"))
+    print(conf_json)
+    print(conf_path('betas'))

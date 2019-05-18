@@ -3,6 +3,7 @@ from com.smpl import *
 from com.path_helper import *
 import os
 import json
+import itertools
 
 smpl = None
 
@@ -43,6 +44,7 @@ def build_sequence(seq_dir, betas, poses=None, transforms=None):
         obj = json.load(fp)
         obj['poses'] = poses.tolist()
         obj['betas'] = betas.tolist()
+        obj['beta'] = np.array(betas[-1]).tolist()[0:4]
         json.dump(obj, fp)
 
 
@@ -61,96 +63,87 @@ def interpolate_param(param1, param2, frame_num):
 
 
 def shape_sequences(base_dir, shapes, frame=5):
+    """
+
+    :param base_dir: 输出文件夹
+    :param shapes: 16 * 4
+    :param frame: 5
+    :return:
+    """
     if not os.path.exists(base_dir):
         os.mkdir(base_dir)
     for i in range(len(shapes)):
-        betas = interpolate_param(np.zeros((10)), shapes[i], frame)
+        beta4 =  np.array(shapes[i])
+        if len(beta4) < 10:
+            beta4 = np.hstack((beta4, np.zeros(10 - len(beta4))))
+        betas = interpolate_param(np.zeros((10)), beta4, frame)
         seq_dir = os.path.join(base_dir, 'seq_' + str5(i))
         build_sequence(seq_dir, betas)
 
 
 def build_17_betas_sequence(out_dir):
-    with open(conf_path("betas_17"), 'r') as fp:
+    with open(conf_path("betas"), 'r') as fp:
         obj = json.load(fp)
     betas = []
     for i in range(17):
-        betas.append(obj[str(i)])
+        betas.append(obj[i])
     shape_sequences(out_dir, betas)
 
 
-def pose_sequences(betas_list, poses_list):
-    base_dir = './pose'
-    if os.path.exists(base_dir):
-        if not os.remove(base_dir):
-            print('dir exists!')
-            return
-    os.mkdir(base_dir)
-    index = []
-    for i in range(len(poses_list)):
-        if i < len(betas_list):
-            betas = betas_list[i]
-        else:
-            betas = betas_list[len(betas_list) - 1]
-        poses = poses_list[i]
-        seq_dir = os.path.join(base_dir, 'seq_' + str(i))
+def pose_sequences(base_dir, beta_pose_pairs):
+
+    if not os.path.exists(base_dir):
+        os.mkdir(base_dir)
+
+    i = 0
+    for pair in beta_pose_pairs:
+        betas = pair[i][0]
+        poses = pair[i][1]
+        seq_dir = os.path.join(base_dir, 'seq_' + str5(i))
         build_sequence(seq_dir, betas, poses)
-        index.append(seq_dir)
-    with open(os.path.join(base_dir, 'index.json'), 'w') as fp:
-        json.dump(index, fp)
+        i += 1
 
 
-
-
-def build_56_poses_sequence():
-    with open('seqs_56.json', 'r') as fp:
+def build_poses_sequence(out_dir, poses_json, shapes_range, interp=20):
+    with open(poses_json, 'r') as fp:
         obj = json.load(fp)
         seqs = np.array(obj)
     poses_list = []
     for seq in seqs:
         interps = []
-        last = np.zeros((24, 3))
-        interps.append(interpolate_param(last, seq[0], 20))
-        last = seq[0]
-        j = 0
+        interps.append(interpolate_param(np.zeros((24, 3)), seq[0], interp))
         for frame in seq:
-            interps.append(interpolate_param(last, frame, 2))
-            j += 1
-            if j % 20 == 0:
-                interps.append(interpolate_param(frame, frame, 10))
-            if j >= 40:
-                break
-            last = np.copy(frame)
+            interps.append(frame)
         out = np.concatenate(interps, axis=0)
         poses_list.append(out)
         print(np.shape(out))
     print(np.shape(poses_list))
+
+    with open(conf_path("betas"), 'r') as fp:
+        obj = json.load(fp)
+    shapes = []
+    for i in shapes_range:
+        shapes.append(obj[i])
+
     # shape params 0 ~ x
-    betas = [np.zeros(10)]
-    param = [-2, -1, 1, 2]
-    for i in range(4):
-        for j in range(4):
-            vec = np.zeros(10)
-            vec[i] = param[j]
-            betas.append(vec)
+    shapes = np.array(shapes) # 17 * 4
+    if len(shapes[0]) < 10:
+        shapes = np.hstack((shapes, np.zeros(len(shapes), 10 - len(shapes[0]))))    # 17 * 10
 
-    # 先生成0 shape的600帧 pose 序列，共56条
-    shapes = interpolate_param(np.zeros((10)), betas[0], 4)
+    betas_list = []
+    for shape in shapes:
+        betas = interpolate_param(np.zeros((10)), shape, interp)
+        betas_list.append(betas)
 
-    pose_sequences([shapes], poses_list)
+    prod = itertools.product(betas_list, poses_list)
 
-
-def bujiu():
-    base = './pose'
-    for i in range(56):
-        src = os.path.join(os.path.join(base, 'seq_' + str(i)), '21.obj')
-        dst = os.path.join(os.path.join(base, 'seq_' + str(i)), '20.obj')
-        import shutil
-        shutil.copyfile(src, dst)
+    pose_sequences(out_dir, prod)
 
 
 if __name__ == '__main__':
     """
     """
     from com.smpl import SMPLModel
-    set_smpl(SMPLModel(conf_path('smpl')))
-    build_17_betas_sequence('../../db/temp/shape/sequence')
+    # set_smpl(SMPLModel(conf_path('smpl')))
+    # build_17_betas_sequence('../../db/temp/shape/sequence')
+    print(conf_path('betas'))

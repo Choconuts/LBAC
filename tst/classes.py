@@ -7,3 +7,6 @@ class A:
     def log(self):
         print(self.a)
 
+
+if __name__ == '__main__':
+    print([1, 2] + [3, 4])
