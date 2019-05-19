@@ -1,7 +1,7 @@
 from com.learning.ground_truth import *
 from com.path_helper import *
 from com.mesh.smooth import *
-from lbac.train.shape_gt import BetaGroundTruth
+from lbac.train.shape_gt import BetaGroundTruth, parse_sim, parse_ext
 from com.mesh.closest_vertex import ClosestVertex
 from com.posture.smpl import *
 
@@ -12,12 +12,13 @@ smpl = SMPLModel(conf_path('smpl'))
 
 
 def gen_pose_gt_data(ext_dir, beta_dir, gt_dir, gen_range=None):
-    meta = load_json(join(ext_dir, 'meta.json'))
-    beta_gt.load(beta_dir)
+    meta, valid_dict = parse_ext(ext_dir)
+
     sim_type = meta['config']['type']
     if gt_dir is None:
         gt_dir = join(conf_path('temp'), sim_type)
-    valid_dict = meta['valids']
+
+    beta_gt.load(beta_dir)
 
     if gen_range is None:
         gen_range = []
@@ -34,18 +35,21 @@ def gen_pose_gt_data(ext_dir, beta_dir, gt_dir, gen_range=None):
     meta['index'] = dict()
     for seq_idx in gen_range:
         frames = valid_dict[seq_idx]
-        seq_meta = load_json(join(ext_dir, str5(seq_idx), 'meta.json'))
+        seq_meta, frame_num, beta, poses = parse_sim(str5(seq_idx))
+        if frames != frame_num:
+            print('warning: invalid seq frames record')
+            frames = frame_num
         disps = []
         for i in range(frames):
             mesh_i = Mesh().load(join(ext_dir, str5(seq_idx), str4(i)))
-            disp = process(mesh_i, seq_meta['beta'], seq_meta['poses'][i])
+            disp = process(mesh_i, beta, poses[i])
             disps.append(disp)
         meta['index'][seq_idx] = len(disps)
 
         data = dict()
         data['disps'] = np.array(disps).tolist()
-        data['poses'] = seq_meta['poses']
-        data['beta'] = seq_meta['beta']
+        data['poses'] = poses
+        data['beta'] = beta
         save_json(data, join(gt_dir, str5(seq_idx) + '.json'))
 
     save_json(meta, join(gt_dir, 'meta.json'))

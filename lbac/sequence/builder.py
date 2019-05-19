@@ -73,7 +73,7 @@ def build_sequence(seq_dir, betas, poses=None, transforms=None):
         json.dump(obj, fp)
 
     if not no_log:
-        print('sequence built in ' + seq_dir)
+        print(': sequence built in ' + seq_dir)
 
 
 def interpolate_param(param1, param2, frame_num):

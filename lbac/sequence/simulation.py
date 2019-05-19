@@ -92,13 +92,15 @@ def simulate(seq_reader: SeqReader, out_dir, cloth_id, sim_range, sim_mode=1, op
     return True
 
 
-def extract_results(extract_dir, sim_type):
+def extract_results(extract_dir, sim_type, seq_reader=None):
     config = dict()
     config['cloth'] = m_cloth_id
     config['sim_range'] = m_sim_range
     config['type'] = sim_type
     config['time'] = m_sim_time
-    extractor = SimExtractor(m_out_dir, m_seq_reader, config)
+    if seq_reader is None:
+        seq_reader = m_seq_reader
+    extractor = SimExtractor(m_out_dir, seq_reader, config)
     extractor.extract(extract_dir)
 
 

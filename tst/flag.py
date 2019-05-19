@@ -6,7 +6,7 @@ import os
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('gpu', None, 'comma separated list of GPU(s) to use.')
-flags.D('x', [1, 2], '123')
+
 
 
 def main(argv):
@@ -20,5 +20,6 @@ def main(argv):
 
 
 if __name__ == '__main__':
+    print(int('00022'))
     app.run(main)
 

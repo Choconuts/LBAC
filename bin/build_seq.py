@@ -1,10 +1,10 @@
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from absl import app
 from absl import flags
-import os
 from lbac.sequence.builder import *
 from lbac.sequence.pose_translator import JsonTranslator, AmcTranslator
 from com.path_helper import *
-
 
 FLAGS = flags.FLAGS
 

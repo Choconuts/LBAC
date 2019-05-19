@@ -8,13 +8,41 @@ smooth_times = 5
 template = Mesh()
 
 
+def parse_sim(seq_dir):
+    meta = load_json(join(seq_dir, 'meta.json'))
+    frames = meta['frames']
+    beta = meta['beta']
+    poses = meta['poses']
+    return meta, frames, beta, poses
+
+
+def parse_ext(ext_dir):
+    if exists(join(ext_dir, 'meta.json')):
+        meta = load_json(join(ext_dir, 'meta.json'))
+        valid_dict = meta['valids']
+    else:
+        meta = dict()
+        valid_dict = dict()
+        dirs = os.listdir(ext_dir)
+        for seq_dir in dirs:
+            count = parse_sim(seq_dir)[1]
+            valid_dict[int(seq_dir)] = count
+        meta['valids'] = valid_dict
+        meta['type'] = 'unknown'
+
+    return meta, valid_dict
+
+
 def gen_beta_gt_data(ext_dir, gt_dir):
-    meta = load_json(join(ext_dir, 'meta.json'))
+
+    meta, valid_dict = parse_ext(ext_dir)
+
     sim_type = meta['config']['type']
     if gt_dir is None:
         gt_dir = join(conf_path('temp'), sim_type)
-    valid_dict = meta['valids']
+
     vertices = dict()
+
     for seq_idx in valid_dict:
         frames = valid_dict[seq_idx]
         mesh = Mesh().load(join(ext_dir, str5(seq_idx), str4(frames - 1)))

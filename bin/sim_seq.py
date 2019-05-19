@@ -1,3 +1,5 @@
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from absl import app
 from absl import flags
 import os
@@ -18,6 +20,7 @@ flags.DEFINE_integer('s', 0, 'start index')
 flags.DEFINE_integer('e', -1, 'end index')
 flags.DEFINE_integer('m', 1, 'mode, 0 for display, 1 for offline')
 flags.DEFINE_integer('cloth', 0, 'cloth id in robe')
+flags.DEFINE_bool('no_ext', False, 'only extract simulation results')
 
 
 def get_dir(key, i):
@@ -49,7 +52,7 @@ def main(argv):
     if end < 0:
         end = seq_reader.seq_num
     res = simulate(seq_reader, sim_dir, cloth_id, range(start, end), mode)
-    if res:
+    if res and not getattr(FLAGS, 'no_ext'):
         extract_results(out_dir, sim_type)
 
 
