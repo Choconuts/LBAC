@@ -11,7 +11,7 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string('in', conf_path('seqs'), 'sequence out put dir, relative to db')
 flags.DEFINE_string('sim', conf_path('sim'), 'sim dir')
 flags.DEFINE_string('out', conf_path('extract'), 'data extracted, both meta and meshes')
-flags.DEFINE_string('dir', 'dd', 'r(relative) a(absolute), or d(relative to db), default d, in-out-ex')
+flags.DEFINE_string('dir', 'rrr', 'r(relative) a(absolute), or d(relative to db), default d, in-out-ex')
 flags.DEFINE_string('mesh', None, 'path to cloth mesh')
 flags.DEFINE_string('type', 'pose', 'simulation type')
 flags.DEFINE_integer('s', 0, 'start index')
@@ -27,7 +27,7 @@ def get_dir(key, i):
     if i >= len(FLAGS.dir):
         i = len(FLAGS.dir) - 1
     if FLAGS.dir[i] == 'd':
-        m_dir = os.path.join(get_base('db'), m_dir)
+        m_dir = os.path.join(get_base(), m_dir)
     return m_dir
 
 
@@ -44,7 +44,7 @@ def main(argv):
     sim_type = getattr(FLAGS, 'type')
 
     if FLAGS.dir[0] == 'd':
-        sim_dir = os.path.join(get_base('db'), sim_dir)
+        sim_dir = os.path.join(get_base(), sim_dir)
     seq_reader = SeqReader(in_dir)
     if end < 0:
         end = seq_reader.seq_num

@@ -10,7 +10,7 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string('in', conf_path('extract'), 'simulation out put dir, relative to db')
 flags.DEFINE_string('beta', conf_path('b_gt'), 'ground truth dir')
 flags.DEFINE_string('pose', conf_path('p_gt'), 'ground truth dir')
-flags.DEFINE_string('dir', 'dd', 'r(relative) a(absolute), or d(relative to db), default d, in-out-ex')
+flags.DEFINE_string('dir', 'rrr', 'r(relative) a(absolute), or d(relative to db), default d, in-out-ex')
 
 flags.DEFINE_integer('smooth', -1, 'gen default')
 flags.DEFINE_integer('s', 0, 'start index')
@@ -28,7 +28,7 @@ def get_dir(key, i):
     if i >= len(FLAGS.dir):
         i = len(FLAGS.dir) - 1
     if FLAGS.dir[i] == 'd':
-        m_dir = os.path.join(get_base('db'), m_dir)
+        m_dir = os.path.join(get_base(), m_dir)
     return m_dir
 
 

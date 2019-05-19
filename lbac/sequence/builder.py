@@ -1,13 +1,24 @@
 ﻿from com.mesh.mesh import *
-from com.smpl import *
+from com.posture.smpl import *
 from com.path_helper import *
 import os
 import json
 import itertools
+from lbac.sequence.pose_translator import JsonTranslator, PoseTranslator
+
+default_translator = JsonTranslator()
+
+
+def set_default_translator(translator: PoseTranslator):
+    global default_translator
+    default_translator = translator
+
 
 smpl = None
 
 no_log = False
+
+frame_log_step = 10
 
 def set_smpl(smpl_model):
     global smpl
@@ -39,6 +50,8 @@ def build_sequence(seq_dir, betas, poses=None, transforms=None):
             smpl.set_params(beta=beta, pose=poses[i])
         mesh = Mesh().from_vertices(smpl.verts, smpl.faces, True)
         mesh.save(os.path.join(seq_dir, str4(i) + '.obj'))
+        if i % frame_log_step == frame_log_step - 1:
+            print('*', end='')
 
     meta_file = os.path.join(seq_dir, 'meta.json')
     if os.path.exists(meta_file):
@@ -112,27 +125,24 @@ def pose_sequences(base_dir, beta_pose_pairs):
 
     i = 0
     for pair in beta_pose_pairs:
-        betas = pair[i][0]
-        poses = pair[i][1]
+        betas = pair[0]
+        poses = pair[1]
         seq_dir = os.path.join(base_dir, 'seq_' + str5(i))
         build_sequence(seq_dir, betas, poses)
         i += 1
 
 
 def build_poses_sequence(out_dir, poses_json, shapes_range, interp=20):
-    with open(poses_json, 'r') as fp:
-        obj = json.load(fp)
-        seqs = np.array(obj)
+    seqs = default_translator.load(poses_json).poses_list()
+
     poses_list = []
     for seq in seqs:
         interps = []
         interps.append(interpolate_param(np.zeros((24, 3)), seq[0], interp))
         for frame in seq:
-            interps.append(frame)
+            interps.append(np.array([frame]))
         out = np.concatenate(interps, axis=0)
         poses_list.append(out)
-        print(np.shape(out))
-    print(np.shape(poses_list))
 
     with open(conf_path("betas"), 'r') as fp:
         obj = json.load(fp)
@@ -143,7 +153,7 @@ def build_poses_sequence(out_dir, poses_json, shapes_range, interp=20):
     # shape params 0 ~ x
     shapes = np.array(shapes) # 17 * 4
     if len(shapes[0]) < 10:
-        shapes = np.hstack((shapes, np.zeros(len(shapes), 10 - len(shapes[0]))))    # 17 * 10
+        shapes = np.hstack((shapes, np.zeros((len(shapes), 10 - len(shapes[0])))))    # 17 * 10
 
     betas_list = []
     for shape in shapes:
@@ -158,7 +168,11 @@ def build_poses_sequence(out_dir, poses_json, shapes_range, interp=20):
 if __name__ == '__main__':
     """
     """
-    from com.smpl import SMPLModel
+    from com.posture.smpl import SMPLModel
     # set_smpl(SMPLModel(conf_path('smpl')))
     # build_17_betas_sequence('../../db/temp/shape/sequence')
-    print(conf_path('betas'))
+    a = [[2, 3]]
+    b = [[[2], [2]], [[4], [4]]]
+    p = itertools.product(a, b)
+    for x in p:
+        print(x)

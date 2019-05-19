@@ -1,5 +1,5 @@
 import json, os
-
+import numpy as np
 
 configure = 'win.json'
 
@@ -15,7 +15,10 @@ def find_dir_upwards(dir_name, iter=5):
         return find_dir_upwards(os.path.join('..', dir_name), iter - 1)
 
 
-def conf_path(key, base="db"):
+def conf_path(key, base=None):
+    if base == None:
+        base = conf_value('database')
+
     path = conf_value(key)
     base_dir = get_base(base)
     if path is not None:
@@ -50,10 +53,12 @@ def str5(i):
     return '%05d' % i
 
 
-def get_base(key):
+def get_base(key=None, max_finding_iter=5):
+    if key is None:
+        key = conf_value('database')
     base_dir = conf_value(key)
     if base_dir is None:
-        base_dir = find_dir_upwards(key, 5)
+        base_dir = find_dir_upwards(key, max_finding_iter)
     return base_dir
 
 
@@ -70,8 +75,21 @@ def load_json(file):
 
 
 def save_json(obj, file):
+    obj = jsonify(obj)
     with open(file, 'w') as fp:
         json.dump(obj, fp)
+
+
+def jsonify(root):
+    if type(root) == list:
+        for i in range(len(root)):
+            root[i] = jsonify(root[i])
+    elif type(root) == dict:
+        for i in root:
+            root[i] = jsonify(root[i])
+    elif type(root) == np.ndarray:
+        return root.tolist()
+    return root
 
 
 if __name__ == '__main__':

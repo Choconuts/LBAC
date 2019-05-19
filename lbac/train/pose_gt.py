@@ -1,10 +1,9 @@
 from com.learning.ground_truth import *
 from com.path_helper import *
-import numpy as np, json
 from com.mesh.smooth import *
 from lbac.train.shape_gt import BetaGroundTruth
 from com.mesh.closest_vertex import ClosestVertex
-from com.smpl import *
+from com.posture.smpl import *
 
 
 beta_gt = BetaGroundTruth()
