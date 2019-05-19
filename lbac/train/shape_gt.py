@@ -73,9 +73,11 @@ class BetaGroundTruth(GroundTruth):
 
     def get_batch(self, size):
         ids = self.batch_manager.get_batch(size)
-        batch = []
+        batch = [[], []]
         for id in ids:
-            batch.append(self.samples[id].derefer())
+            sample = self.samples[id].derefer()
+            batch[0].append(sample[0])
+            batch[1].append(sample[1])
         return batch
 
 

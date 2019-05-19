@@ -53,6 +53,10 @@ class BatchManager:
         random.shuffle(self.element[0:self.train_cut])
         return self
 
+    def shuffle_all(self):
+        random.shuffle(self.element)
+        return self
+
     def get_batch(self, size):
         tmp_ptr = self.pointer
         self.pointer += size

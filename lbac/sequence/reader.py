@@ -68,10 +68,13 @@ class SimExtractor:
                 valid_count += 1
             frame += 1
             mesh = join(sim_out, str4(frame) + '_00.obj')
+        if valid_count == 0:
+            return valid_count
         seq_meta['seq_frames'] = seq_meta['frames']
         seq_meta['frames'] = valid_count
-        with open(join(ext_dir, 'meta.json'), 'w') as fp:
-            json.dump(seq_meta, fp)
+        seq_meta['poses'] = seq_meta['poses'][skip: skip + valid_count]
+
+        save_json(seq_meta, join(ext_dir, 'meta.json'))
 
         return valid_count
 

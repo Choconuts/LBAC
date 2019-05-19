@@ -6,7 +6,7 @@ import os
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('gpu', None, 'comma separated list of GPU(s) to use.')
-flags.DEFINE_bool('x', False, '123')
+flags.D('x', [1, 2], '123')
 
 
 def main(argv):
