@@ -38,7 +38,8 @@ class SimExtractor:
         i = 0
         while os.path.exists(os.path.join(self.sim_dir, str5(i))):
             i += 1
-        self.seq_num = i
+        if 'sim_range' in config:
+            self.ext_range = config['sim_range']
         with open(os.path.join(self.extract_dir, 'meta.json'), 'w') as fp:
             json.dump(self.meta, fp)
 
@@ -80,7 +81,8 @@ class SimExtractor:
 
     def extract(self, extract_dir):
         self.extract_dir = extract_dir
-        for i in range(self.seq_num):
+        ext_range = self.ext_range
+        for i in ext_range:
             meta = self.seq_reader.load_meta(i)
             count = self.extract_seq(i, meta)
             if count > 0:

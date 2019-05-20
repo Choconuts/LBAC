@@ -32,12 +32,9 @@ def main(argv):
 
     out_dir = get_dir('out', 1)
 
-    if FLAGS.dir[0] == 'd':
-        out_dir = os.path.join(get_base(), out_dir)
-
     if FLAGS.type == 's':
         set_smpl(SMPLModel(conf_path('smpl')))
-        build_17_betas_sequence(FLAGS.out, FLAGS.lerp)
+        build_17_betas_sequence(out_dir, FLAGS.lerp)
     elif FLAGS.type in ['p', 'a', 'j']:
         if FLAGS.type == 'a':
             set_default_translator(AmcTranslator())

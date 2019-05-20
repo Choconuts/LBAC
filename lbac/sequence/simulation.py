@@ -61,7 +61,7 @@ def run_seq(i, option):
     mo = conf['morph_obstacle']
     mo['frame'] = get('obs_frame', get_seq_frame(i))
     mo['frame_time'] = get('frame_time', 0.033)
-    mo['dir'] = os.path.join(seq_dir, 'seq_' + str(i))
+    mo['dir'] = os.path.join(seq_dir, 'seq_' + str5(i))
 
     with open(conf_tmp(i), 'w') as fp:
         json.dump(conf, fp)
@@ -70,7 +70,7 @@ def run_seq(i, option):
 
 
 def simulate(seq_reader: SeqReader, out_dir, cloth_id, sim_range, sim_mode=1, option=None):
-    global m_out_dir, m_cloth_id, m_sim_type, m_seq_reader, m_sim_range
+    global m_out_dir, m_cloth_id, m_sim_type, m_seq_reader, m_sim_range, m_sim_time
     m_out_dir = out_dir
     m_cloth_id = cloth_id
     m_sim_type = sim_mode

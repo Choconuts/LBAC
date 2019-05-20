@@ -33,9 +33,9 @@ class AmcTranslator(PoseTranslator):
         data = []
         for sub in self.meta['gen']:
             for seq in self.meta['gen'][sub]:
-                id = str(sub) + '_' + str(seq)
-                asf = join(base, id, str(sub) + '.asf')
-                amc = join(base, id, id + '.amc')
+                id = sub + '_' + str(seq)
+                asf = join(base, id, "%02d" % int(sub) + '.asf')
+                amc = join(base, id, "%02d" % int(sub) + '_' + "%02d" % seq + '.amc')
 
                 motions = load_motion(amc)
                 if max_length >= 0:

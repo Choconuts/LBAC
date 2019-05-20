@@ -49,7 +49,7 @@ def build_sequence(seq_dir, betas, poses=None, transforms=None):
         else:
             smpl.set_params(beta=beta, pose=poses[i])
         mesh = Mesh().from_vertices(smpl.verts, smpl.faces, True)
-        mesh.save(os.path.join(seq_dir, str4(i) + '.obj'))
+        mesh.save(os.path.join(seq_dir, str(i) + '.obj'))
         if i % frame_log_step == frame_log_step - 1:
             print('*', end='')
 
@@ -127,6 +127,10 @@ def pose_sequences(base_dir, beta_pose_pairs):
     for pair in beta_pose_pairs:
         betas = pair[0]
         poses = pair[1]
+        # warning
+        # conflicts avoiding
+        while exists(join(base_dir, 'seq_' + str5(i))):
+            i += 1
         seq_dir = os.path.join(base_dir, 'seq_' + str5(i))
         build_sequence(seq_dir, betas, poses)
         i += 1
