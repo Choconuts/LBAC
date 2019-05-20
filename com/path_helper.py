@@ -69,6 +69,8 @@ conf_json = os.path.join(find_dir_upwards('conf'), configure)
 
 
 def load_json(file):
+    if not exists(file):
+        return None
     with open(file, 'r') as fp:
         obj = json.load(fp)
     return obj

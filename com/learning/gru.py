@@ -1,11 +1,11 @@
 import tensorflow as tf
 import numpy as np
-from com.learning.graph_helper import Graph
+from com.learning.graph_helper import GraphBase
 
 
 n_input = 10                # RNN 单元输入节点的个数
 n_steps = 5                 # 序列长度
-n_hidden = 20               # RNN 单元输出节点个数(即隐藏层个数) 1500
+n_hidden = [20]             # RNN 单元输出节点个数(即隐藏层个数) 1500
 n_output = 10               # 输出
 batch_size = 128            # 小批量大小 128
 iter = 1000                 # 迭代次数
@@ -13,6 +13,8 @@ show_step = 10              # 显示步数
 learning_rate = 1e-3        # 学习率
 decay_step = 200            # 学习率下降
 keep_probability = 0.9      # 保持率
+test_flag = False           # 测试
+save_step = 100             # saving
 graph_id = 'gru'            # id
 
 
@@ -53,7 +55,7 @@ def graph():
     keep_prob = tf.placeholder(tf.float32, name="keep_prob")
 
     # 可以看做隐藏层
-    hidden, states = single_layer_dynamic_gru(x_input, n_steps, n_hidden, seq_lens)
+    hidden, states = single_layer_dynamic_gru(x_input, n_steps, n_hidden[0], seq_lens)
 
     # 取 RNN 最后一个时序的输出，然后经过全连接网络得到输出值
     hidden = tf.nn.dropout(hidden, keep_prob)
@@ -133,18 +135,17 @@ def predict_process(batch: list, is_test):
     return batch[0:4]
 
 
-def bind(g: Graph):
-    g.batch_process = batch_process
-    g.show_steps = show_step
-    g.iter = iter
+def bind(g: GraphBase):
+    g.set_steps(iter, show_step, save_step)
+    g.set_callback(batch_process, predict_process)
     g.batch_size = batch_size
+    g.graph_func = graph
 
 
-class GRUGraph(Graph):
+class Graph(GraphBase):
     def __init__(self):
-        Graph.__init__(self, graph_id)
+        GraphBase.__init__(self, graph_id)
         bind(self)
-        self.graph_func = graph
 
 
 if __name__ == '__main__':

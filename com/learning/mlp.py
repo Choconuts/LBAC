@@ -1,16 +1,19 @@
 import tensorflow as tf
 import numpy as np
-from com.learning.graph_helper import Graph
+from com.learning.graph_helper import GraphBase
 
 
-n_input = 10
+n_input = 4
 n_output = 7366 * 3
 learning_rate = 1e-3
 decay_step = 500
+iter = 1000
 keep_probability = 0.99
 batch_size = 10
 show_step = 100
-hidden = [20]
+n_hidden = [20]
+test_flag = False           # 测试
+save_step = 100
 graph_id = 'mlp'
 
 
@@ -43,7 +46,7 @@ def graph():
 
     # 第1、2、3层: 全连接
     full = None
-    for h in hidden:
+    for h in n_hidden:
         full = full_conn_layer(x_input, h, keep_prob, tf.nn.relu)
     output = full_conn_layer(full, n_output, keep_prob, name="output")
 
@@ -77,19 +80,22 @@ def batch_process(batch: list, is_train, local_step):
 
 def predict_process(batch: list, is_test):
     batch.insert(1, 1)
-    batch.insert(2, None)
+    if len(batch) < 3:
+        batch.insert(2, None)
     return batch[0:3]
 
 
-class MLPGraph(Graph):
-    def __init__(self):
-        Graph.__init__(self, graph_id)
-        self.batch_process = batch_process
-        self.show_steps = show_step
-        self.iter = iter
-        self.batch_size = batch_size
-        self.graph_func = graph
+def bind(g: GraphBase):
+    g.set_steps(iter, show_step, save_step)
+    g.set_callback(batch_process, predict_process)
+    g.batch_size = batch_size
+    g.graph_func = graph
 
+
+class Graph(GraphBase):
+    def __init__(self):
+        GraphBase.__init__(self, graph_id)
+        bind(self)
 
 
 if __name__ == '__main__':

@@ -1,5 +1,6 @@
 import tensorflow as tf
 import os
+from com.path_helper import *
 
 
 class Canvas:
@@ -19,7 +20,7 @@ class Canvas:
             self.load(path)
         return self.sess
 
-    def save(self, path=None, flag=False, step=-1):
+    def save(self, path=None, write_meta_flag=False, step=-1):
         if path is not None:
             self.path = path
         if not os.path.exists(self.path):
@@ -34,10 +35,10 @@ class Canvas:
                 saver.save(sess, self.model_file(), global_step=step)
         # 如果flag为True，则必定重新保存图
         elif step < 0:
-            saver.save(sess, self.model_file(), write_meta_graph=flag)
+            saver.save(sess, self.model_file(), write_meta_graph=write_meta_flag)
         # 如果step大于等于0，保存步数
         else:
-            saver.save(sess, self.model_file(), global_step=step, write_meta_graph=flag)
+            saver.save(sess, self.model_file(), global_step=step, write_meta_graph=write_meta_flag)
         return self
 
     def save_all(self, path=None, step=-1):
@@ -59,8 +60,14 @@ class Canvas:
         if path is not None:
             self.path = path
         sess =self.sess
+        if not exists(self.meta_file()) or not exists(self.model_file()):
+            print('warning: loading failed in %s' % self.path)
+            return self
         saver = tf.train.import_meta_graph(self.meta_file())
         if step >= 0:
+            if not exists(self.step_file(step)):
+                print('warning: loading failed in %s of step %d' % (self.path, step))
+                return self
             saver.restore(sess, self.step_file(step))
         saver.restore(sess, self.model_file())
         return self

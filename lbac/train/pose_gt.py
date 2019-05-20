@@ -35,13 +35,14 @@ def gen_pose_gt_data(ext_dir, beta_dir, gt_dir, gen_range=None):
     meta['index'] = dict()
     for seq_idx in gen_range:
         frames = valid_dict[seq_idx]
+        seq_idx = int(seq_idx)
         seq_meta, frame_num, beta, poses = parse_sim(str5(seq_idx))
         if frames != frame_num:
             print('warning: invalid seq frames record')
             frames = frame_num
         disps = []
         for i in range(frames):
-            mesh_i = Mesh().load(join(ext_dir, str5(seq_idx), str4(i)))
+            mesh_i = Mesh().load(join(ext_dir, str5(seq_idx), str4(i) + '.obj'))
             disp = process(mesh_i, beta, poses[i])
             disps.append(disp)
         meta['index'][seq_idx] = len(disps)

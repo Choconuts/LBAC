@@ -175,8 +175,5 @@ if __name__ == '__main__':
     from com.posture.smpl import SMPLModel
     # set_smpl(SMPLModel(conf_path('smpl')))
     # build_17_betas_sequence('../../db/temp/shape/sequence')
-    a = [[2, 3]]
-    b = [[[2], [2]], [[4], [4]]]
-    p = itertools.product(a, b)
-    for x in p:
-        print(x)
+    x = interpolate_param([1, 2, 3], [4, 5, 6], 3)
+    print(x)

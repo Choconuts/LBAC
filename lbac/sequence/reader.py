@@ -60,15 +60,15 @@ class SimExtractor:
         import shutil
         shutil.copy(join(sim_out, 'conf.json'), join(ext_dir, 'conf.json'))
         frame = 0
-        mesh = join(sim_out, str4(frame) + '_00.obj')
+        mesh = str4(frame) + '_00.obj'
         file_names = os.listdir(sim_out)
         valid_count = 0
         while mesh in file_names:
-            shutil.copy(join(sim_out, mesh), join(ext_dir, join(sim_out, str4(frame - skip) + '.obj')))
-            if frame >= skip:
+            shutil.copy(join(sim_out, mesh), join(ext_dir, str4(frame - skip - 1) + '.obj'))
+            if frame > skip:
                 valid_count += 1
             frame += 1
-            mesh = join(sim_out, str4(frame) + '_00.obj')
+            mesh = str4(frame) + '_00.obj'
         if valid_count == 0:
             return valid_count
         seq_meta['seq_frames'] = seq_meta['frames']
@@ -82,10 +82,13 @@ class SimExtractor:
     def extract(self, extract_dir):
         self.extract_dir = extract_dir
         ext_range = self.ext_range
+        print('extract to %s, range: ' % extract_dir, ext_range)
         for i in ext_range:
             meta = self.seq_reader.load_meta(i)
+            assert 'frames' in meta
             count = self.extract_seq(i, meta)
             if count > 0:
+                print('%d' % count, end=' ')
                 self.meta['valids'][i] = count
         with open(join(self.extract_dir, 'meta.json'), 'w') as fp:
             json.dump(self.meta, fp)

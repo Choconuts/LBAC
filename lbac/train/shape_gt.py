@@ -45,7 +45,8 @@ def gen_beta_gt_data(ext_dir, gt_dir):
 
     for seq_idx in valid_dict:
         frames = valid_dict[seq_idx]
-        mesh = Mesh().load(join(ext_dir, str5(seq_idx), str4(frames - 1)))
+        seq_idx = int(seq_idx)
+        mesh = Mesh().load(join(ext_dir, str5(seq_idx), str4(frames - 1) + '.obj'))
         mesh.vertices = smooth_mesh(mesh).vertices
         if seq_idx == 0:
             global template

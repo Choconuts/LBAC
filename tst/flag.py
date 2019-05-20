@@ -6,12 +6,12 @@ import os
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('gpu', None, 'comma separated list of GPU(s) to use.')
-
+flags.DEFINE_string('l', None, 'comma separated list of GPU(s) to use.')
 
 
 def main(argv):
     del argv
-    print(FLAGS.x)
+    print(FLAGS.l)
     if FLAGS.gpu:
         os.environ['CUDA_VISIBLE_DEVICES'] = FLAGS.gpu
     else:
