@@ -45,8 +45,10 @@ def graph():
     y_true = tf.placeholder(tf.float32, shape=[None, n_output], name="y")
 
     # 第1、2、3层: 全连接
-    full = None
+    full = x_input
     for h in n_hidden:
+        if h == 0:
+            continue
         full = full_conn_layer(x_input, h, keep_prob, tf.nn.relu)
     output = full_conn_layer(full, n_output, keep_prob, name="output")
 

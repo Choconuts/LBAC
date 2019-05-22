@@ -106,7 +106,7 @@ def batch_slice(batch):
 
 
 def batch_process(batch: list, is_train, local_step):
-    if len(batch[0]) != batch_size or len(batch[0][0]) <= n_steps:
+    if len(batch[0]) != batch_size or len(batch[0][0]) < n_steps:
         return None
     batch[0] = np.array(batch[0]).reshape((batch_size, -1, n_input))
     batch[1] = np.array(batch[1]).reshape((batch_size, -1, n_output))
@@ -126,7 +126,14 @@ def batch_process(batch: list, is_train, local_step):
 
 
 def predict_process(batch: list, is_test):
-    if len(batch[0]) <= n_steps:
+    if is_test:
+        global batch_size
+        tmp = batch_size
+        batch_size = len(batch[0])
+        batch = batch_process(batch, False, 1)
+        batch_size = tmp
+        return batch
+    if len(batch[0]) < n_steps:
         return None
     batch[0] = np.array(batch[0])[:, -n_steps:].reshape((-1, n_steps, n_input))
     batch.insert(1, 1)

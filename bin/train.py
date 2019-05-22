@@ -25,12 +25,12 @@ flags.DEFINE_integer('decay', None, 'start index')
 flags.DEFINE_float('rate', None, 'start index')
 flags.DEFINE_float('keep', None, 'start index')
 flags.DEFINE_bool('test', None, 'start index')
-flags.DEFINE_bool('name', None, 'start index')
+flags.DEFINE_string('name', None, 'start index')
 flags.DEFINE_multi_integer('hidden', None, 'start index')
 flags.DEFINE_integer('rnn_step', None, 'rnn step')
 flags.DEFINE_integer('save', None, 'save step')
 
-flags.DEFINE_multi_string('g', ['mlp'], 'which to load')
+flags.DEFINE_multi_string('g', ['gru'], 'which to load')
 
 mapping = {
     "n_input": "input",
@@ -40,7 +40,7 @@ mapping = {
     "batch_size": "batch",
     "learning_rate": "rate",
     "decay_step": "decay",
-    "n_step": "rnn_step",
+    "n_steps": "rnn_step",
     "save_step": "save",
     "keep_probability": "keep",
     "show_step": "show",
@@ -102,12 +102,14 @@ def main(argv):
             g = module.Graph()
             if load_step is not None:
                 g.restore()
+                g.global_step = load_step
             else:
                 g.generate()
             canvas.path = output_dir
-            g.train(canvas, gt, test=module.test_flag, initialize=load_step is None)
 
-            canvas.save_all()
+            g.train(canvas, gt, test=module.test_flag, initialize=load_step is None)
+            if output_dir is not None:
+                canvas.save_all()
 
         import lbac.train.train_helper as th
 

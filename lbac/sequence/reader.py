@@ -54,10 +54,14 @@ class SimExtractor:
             skip = seq_meta['interp']
 
         ext_dir = join(self.extract_dir, str5(i))
-        if not exists(ext_dir):
-            os.makedirs(ext_dir)
+
         sim_out = join(self.sim_dir, str5(i))
         import shutil
+        if not exists(join(sim_out, 'conf.json')):
+            print('sim %05d failed' % i)
+            return 0
+        if not exists(ext_dir):
+            os.makedirs(ext_dir)
         shutil.copy(join(sim_out, 'conf.json'), join(ext_dir, 'conf.json'))
         frame = 0
         mesh = str4(frame) + '_00.obj'

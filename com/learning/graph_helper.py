@@ -94,7 +94,7 @@ class GraphBase:
             self.train_step(sess, ground_truth.get_batch(self.batch_size), i + 1)
             if (i + 1) % self.show_steps == 0:
                 self.eval_step(sess, ground_truth.get_batch(self.batch_size), i + 1)
-            if (i + 1) % self.save_step == 0:
+            if self.save_step is not None and self.save_step > 0 and (i + 1) % self.save_step == 0:
                 self.save_graph()
                 canvas.save_step(self.global_step)
 

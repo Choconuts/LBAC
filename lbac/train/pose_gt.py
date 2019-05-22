@@ -141,7 +141,10 @@ class PoseGroundTruth(GroundTruth):
             self.data[i] = load_json(join(gt_dir, str5(i) + '.json'))
 
     def get_batch(self, size):
+        last = self.batch_manager.pointer
         ids = self.batch_manager.get_batch(size)
+        if last > self.batch_manager.pointer:
+            self.batch_manager.shuffle()
         batch = [[], []]
         for id in ids:
             sample = self.samples[id].derefer()

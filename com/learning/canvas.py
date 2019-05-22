@@ -23,6 +23,8 @@ class Canvas:
     def save(self, path=None, write_meta_flag=False, step=-1):
         if path is not None:
             self.path = path
+        if self.path is None:
+            return
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         sess =self.sess
@@ -60,12 +62,12 @@ class Canvas:
         if path is not None:
             self.path = path
         sess =self.sess
-        if not exists(self.meta_file()) or not exists(self.model_file()):
-            print('warning: loading failed in %s' % self.path)
+        if not exists(self.meta_file()):
+            print('warning: loading failed in %s' % self.meta_file())
             return self
         saver = tf.train.import_meta_graph(self.meta_file())
         if step >= 0:
-            if not exists(self.step_file(step)):
+            if not exists(self.step_file(step) + '.index'):
                 print('warning: loading failed in %s of step %d' % (self.path, step))
                 return self
             saver.restore(sess, self.step_file(step))

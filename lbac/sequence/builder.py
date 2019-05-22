@@ -18,11 +18,22 @@ smpl = None
 
 no_log = False
 
+continue_flag = False
+
 frame_log_step = 10
 
 def set_smpl(smpl_model):
     global smpl
     smpl = smpl_model
+
+
+def skipping(base_dir):
+    skip = 0
+    if continue_flag:
+        print('continue building in %s' % base_dir)
+        skip = find_last_in_dir(base_dir, lambda i: 'seq_' + str5(i)) - 1
+        print('skip: %d' % skip)
+    return skip
 
 
 def build_sequence(seq_dir, betas, poses=None, transforms=None):
@@ -39,19 +50,6 @@ def build_sequence(seq_dir, betas, poses=None, transforms=None):
         os.makedirs(seq_dir)
     if poses is None:
         poses = np.zeros((len(betas), 24, 3))
-    for i in range(len(poses)):
-        if i > len(betas) - 1:
-            beta = betas[len(betas) - 1]
-        else:
-            beta = betas[i]
-        if transforms is not None:
-            smpl.set_params(beta=beta, pose=poses[i], trans=transforms[i])
-        else:
-            smpl.set_params(beta=beta, pose=poses[i])
-        mesh = Mesh().from_vertices(smpl.verts, smpl.faces, True)
-        mesh.save(os.path.join(seq_dir, str(i) + '.obj'))
-        if i % frame_log_step == frame_log_step - 1:
-            print('*', end='')
 
     meta_file = os.path.join(seq_dir, 'meta.json')
     if os.path.exists(meta_file):
@@ -69,8 +67,32 @@ def build_sequence(seq_dir, betas, poses=None, transforms=None):
     obj['poses'] = poses.tolist()
     obj['betas'] = betas.tolist()
     obj['beta'] = np.array(betas[-1]).tolist()[0:4]
+
+    skip = 0
+    if continue_flag:
+        skip = find_last_in_dir(seq_dir, lambda i: str(i) + '.obj') - 1
+        if 'restore' not in obj:
+            obj['restore'] = []
+        obj['restore'].append(skip)
+
     with open(meta_file, 'w') as fp:
         json.dump(obj, fp)
+
+    for i in range(len(poses)):
+        if i < skip:
+            continue
+        if i > len(betas) - 1:
+            beta = betas[len(betas) - 1]
+        else:
+            beta = betas[i]
+        if transforms is not None:
+            smpl.set_params(beta=beta, pose=poses[i], trans=transforms[i])
+        else:
+            smpl.set_params(beta=beta, pose=poses[i])
+        mesh = Mesh().from_vertices(smpl.verts, smpl.faces, True)
+        mesh.save(os.path.join(seq_dir, str(i) + '.obj'))
+        if i % frame_log_step == frame_log_step - 1:
+            print('*', end='')
 
     if not no_log:
         print(': sequence built in ' + seq_dir)
@@ -98,9 +120,12 @@ def shape_sequences(base_dir, shapes, frame=5):
     :param frame: 5
     :return:
     """
+    skip = skipping(base_dir)
     if not os.path.exists(base_dir):
         os.makedirs(base_dir)
     for i in range(len(shapes)):
+        if i < skip:
+            continue
         beta4 =  np.array(shapes[i])
         if len(beta4) < 10:
             beta4 = np.hstack((beta4, np.zeros(10 - len(beta4))))
@@ -118,20 +143,27 @@ def build_17_betas_sequence(out_dir, interp=5):
     shape_sequences(out_dir, betas, interp)
 
 
-def pose_sequences(base_dir, beta_pose_pairs):
+def pose_sequences(base_dir, pose_beta_pairs):
 
     if not os.path.exists(base_dir):
         os.mkdir(base_dir)
 
+    skip = skipping(base_dir)
+
     i = 0
-    for pair in beta_pose_pairs:
-        betas = pair[0]
-        poses = pair[1]
+    for pair in pose_beta_pairs:
+        betas = pair[1]
+        poses = pair[0]
         # warning
         # conflicts avoiding
-        while exists(join(base_dir, 'seq_' + str5(i))):
+        if not continue_flag:
+            while exists(join(base_dir, 'seq_' + str5(i))):
+                i += 1
+        elif i < skip:
             i += 1
+            continue
         seq_dir = os.path.join(base_dir, 'seq_' + str5(i))
+        print('building %s with %d frames' % (seq_dir, len(poses)), np.shape(poses), 'of shape ', betas)
         build_sequence(seq_dir, betas, poses)
         i += 1
 
@@ -164,9 +196,14 @@ def build_poses_sequence(out_dir, poses_json, shapes_range, interp=20):
         betas = interpolate_param(np.zeros((10)), shape, interp)
         betas_list.append(betas)
 
-    prod = itertools.product(betas_list, poses_list)
+    prod = itertools.product(poses_list, betas_list)
 
     pose_sequences(out_dir, prod)
+
+
+def set_continue(status=True):
+    global continue_flag
+    continue_flag = status
 
 
 if __name__ == '__main__':

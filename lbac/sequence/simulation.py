@@ -3,7 +3,7 @@ import os
 import copy
 from com.path_helper import *
 from lbac.sequence.reader import SeqReader, SimExtractor
-import time
+import time, random
 
 template_file = conf_path('arcsim_conf_template')
 arcsim_exe = conf_path('arcsim')
@@ -17,6 +17,9 @@ m_sim_type = 1
 m_seq_reader = None
 m_sim_range = []
 m_sim_time = 0
+random.seed(time.time())
+prefix = random.randint(0, 99999)
+print('random int: ', prefix)
 
 
 def cloth_mesh():
@@ -27,7 +30,7 @@ def conf_tmp(i):
     conf_dir = os.path.join(temp_dir, 'conf')
     if not os.path.exists(conf_dir):
         os.makedirs(conf_dir)
-    return os.path.join(conf_dir, str5(i) + '.json')
+    return os.path.join(conf_dir, str5(prefix) + str5(i) + '.json')
 
 
 def out_path(i):
@@ -65,6 +68,10 @@ def run_seq(i, option):
 
     with open(conf_tmp(i), 'w') as fp:
         json.dump(conf, fp)
+
+    if exists(out_path(i)):
+        import shutil
+        shutil.rmtree(out_path(i))
 
     os.system(sim(conf_tmp(i), out_path(i), m_sim_type))
 

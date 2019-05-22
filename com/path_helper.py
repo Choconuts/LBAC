@@ -94,6 +94,14 @@ def jsonify(root):
     return root
 
 
+def find_last_in_dir(base_dir, file_name_lambda):
+    dirs = os.listdir(base_dir)
+    i = 0
+    while file_name_lambda(i) in dirs:
+        i += 1
+    return i
+
+
 if __name__ == '__main__':
     print(conf_json)
     print(conf_path('betas'))
