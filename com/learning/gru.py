@@ -5,7 +5,7 @@ from com.learning.graph_helper import GraphBase
 
 n_input = 10                # RNN 单元输入节点的个数
 n_steps = 5                 # 序列长度
-n_hidden = [20]             # RNN 单元输出节点个数(即隐藏层个数) 1500
+n_hidden = [128]             # RNN 单元输出节点个数(即隐藏层个数) 1500
 n_output = 10               # 输出
 batch_size = 128            # 小批量大小 128
 iter = 1000                 # 迭代次数
