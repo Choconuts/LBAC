@@ -38,7 +38,14 @@ def out_path(i):
 
 
 def sim(conf, out='', op=0):
-    ops = ['simulate', 'simulateoffline']
+    ops = ['simulate', 'simulateoffline', 'resumeoffline', 'resume']
+    if op > 1 and op < 4:
+        last = find_last_in_dir(out, lambda i: str4(i) + '_00.obj')
+        if last > 0:
+            cmd = arcsim_exe + ' ' + ops[op] + ' ' + out + ' ' + str(last - 1)
+            print(cmd)
+            return cmd
+        op = 3 - op
     print(arcsim_exe + ' ' + ops[op] + ' ' + conf + ' ' + out)
     return arcsim_exe + ' ' + ops[op] + ' ' + conf + ' ' + out
 
@@ -69,7 +76,7 @@ def run_seq(i, option):
     with open(conf_tmp(i), 'w') as fp:
         json.dump(conf, fp)
 
-    if exists(out_path(i)):
+    if m_sim_type < 2 and exists(out_path(i)):
         import shutil
         shutil.rmtree(out_path(i))
 
