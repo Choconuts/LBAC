@@ -95,7 +95,7 @@ class BetaGroundTruth(GroundTruth):
         self.samples = []
 
         for i in self.index:
-            sample = BetaSampleId(i, self.data)
+            sample = BetaSampleId(str(i), self.data)
             self.samples.append(sample)
 
         return self

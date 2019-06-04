@@ -38,7 +38,7 @@ class BatchManager:
         self.max_num = max_num
         self.pointer = 0
         self.train_cut = cut
-        self.element = np.linspace(0, max_num - 1, max_num)
+        self.element = np.linspace(0, max_num - 1, max_num).astype('i')
         self.auto_shufle = False
 
     def cut(self, new_cut):
