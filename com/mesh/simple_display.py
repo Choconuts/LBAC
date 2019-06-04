@@ -149,12 +149,12 @@ def run_glut():
     glutInit()
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE)
     glutInitWindowSize(1280, 720)
-    window = glutCreateWindow(bytes(window_name, encoding = "utf8"))
+    window = glutCreateWindow(bytes(window_name, encoding="utf8"))
     glutReshapeFunc(reshape)
     glutIdleFunc(callbacks.idle)
     glutDisplayFunc(display)
-    # glutKeyboardFunc(cb.keyboard)
-    # glutSpecialFunc(cb.special)
+    glutKeyboardFunc(callbacks.keyboard)
+    glutSpecialFunc(callbacks.special)
     glutMouseFunc(mouse)
     glutMotionFunc(motion)
 
@@ -166,6 +166,8 @@ def run_glut():
 class CallBacks:
     def __init__(self):
         self.idle = None
+        self.keyboard = None
+        self.special = None
 
 
 callbacks = CallBacks()
@@ -192,6 +194,15 @@ def set_display(draw):
 def set_init(init):
     global init_func
     init_func = init
+
+
+def set_callbacks(idle=None, key=None, spec=None):
+    if idle is not None:
+        callbacks.idle = idle
+    if key is not None:
+        callbacks.keyboard = key
+    if spec is not None:
+        callbacks.special = spec
 
 
 if __name__ == '__main__':

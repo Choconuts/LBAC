@@ -28,7 +28,7 @@ def draw_mesh(mesh, color):
     # glFlush()
 
 
-def init():
+def init_array_renderer():
     glShadeModel(GL_SMOOTH)
     glEnableClientState(GL_VERTEX_ARRAY)
     glEnableClientState(GL_NORMAL_ARRAY)
@@ -51,7 +51,7 @@ class MeshRenderer:
         m_vbo.set_array(gen_mesh_array(self.mesh, self.color))
         m_vbo.bind()
         self.ebo.bind()
-        glDrawElements(GL_TRIANGLES, len(self.mesh.faces * 3), GL_UNSIGNED_INT, self.ebo)
+        glDrawElements(GL_TRIANGLES, len(self.mesh.faces) * 3, GL_UNSIGNED_INT, self.ebo)
 
 
 m_vbo = vbo.VBO(np.array([]))

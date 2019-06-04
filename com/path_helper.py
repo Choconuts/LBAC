@@ -24,7 +24,7 @@ def conf_path(key, base=None):
     if path is not None:
         path = os.path.join(base_dir, path)
         return path
-    return conf_value(key + '_a')
+    return os.path.join(base_dir, key)
 
 
 def conf_value(key):

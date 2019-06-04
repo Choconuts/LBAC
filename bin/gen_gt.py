@@ -9,8 +9,8 @@ from lbac.train.pose_gt import gen_pose_gt_data
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string('in', conf_path('extract'), 'simulation out put dir, relative to db')
-flags.DEFINE_string('beta', conf_path('b_gt'), 'ground truth dir')
+flags.DEFINE_string('in', conf_path("extract/004/beta"), 'simulation out put dir, relative to db')
+flags.DEFINE_string('beta', conf_path("gt/004/beta"), 'ground truth dir')
 flags.DEFINE_string('pose', conf_path('p_gt'), 'ground truth dir')
 flags.DEFINE_string('dir', 'rrr', 'r(relative) a(absolute), or d(relative to db), default d, in-out-ex')
 
@@ -38,7 +38,7 @@ def main(argv):
     del argv
 
     beta_gt_dir = get_dir('beta', 1)
-    pose_gt_dir = get_dir('pose', 1)
+    pose_gt_dir = get_dir('pose', 2)
     in_dir = get_dir('in', 0)
 
     shape_flag = getattr(FLAGS, 'b')
