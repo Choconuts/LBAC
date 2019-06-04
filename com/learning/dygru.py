@@ -18,9 +18,9 @@ save_step = 100             # saving
 graph_id = 'gru'            # id
 
 
-def single_layer_static_gru(input_x, n_steps, n_hidden):
+def single_layer_dynamic_gru(input_x, n_steps, n_hidden, seq_len):
     '''
-    返回静态单层GRU单元的输出，以及cell状态
+    返回动态单层GRU单元的输出，以及cell状态
 
     args:
         input_x:输入张量 形状为[batch_size,n_steps,n_input]
@@ -28,15 +28,21 @@ def single_layer_static_gru(input_x, n_steps, n_hidden):
         n_hidden：gru单元输出的节点个数 即隐藏层节点数
     '''
 
-    # 把输入input_x按列拆分，并返回一个有n_steps个张量组成的list 如batch_sizex28x28的输入拆成[(batch_size,28),((batch_size,28))....]
-    # 如果是调用的是静态rnn函数，需要这一步处理   即相当于把序列作为第一维度
-    input_x1 = tf.unstack(input_x, num=n_steps, axis=1)
-
+    input_x = tf.transpose(input_x, [1, 0, 2])
     # 可以看做隐藏层
     gru_cell = tf.contrib.rnn.GRUCell(num_units=n_hidden)
-    # 静态rnn函数传入的是一个张量list  每一个元素都是一个(batch_size,n_input)大小的张量
-    hiddens, states = tf.contrib.rnn.static_rnn(cell=gru_cell, inputs=input_x1, dtype=tf.float32)
+    # gru_cell = keras.layers.GRUCell(n_hidden)
 
+    # 动态rnn函数传入的是一个三维张量，[batch_size,n_steps,n_input]  输出也是这种形状
+    # hiddens, states = keras.layers.RNN(cell=gru_cell, inputs=input_x, dtype=tf.float32, sequence_length=seq_len, time_major=True)
+    # hiddens, states = keras.layers.RNN(cell=gru_cell, return_sequences=True, return_state=True, inputs=input_x, dtype=tf.float32, sequence_length=seq_len,
+    #                                    time_major=True)
+
+    hiddens, states = tf.nn.dynamic_rnn(cell=gru_cell, inputs=input_x,
+                                       dtype=tf.float32, sequence_length=seq_len, time_major=True)
+
+    # 注意这里输出需要转置  转换为时序优先的
+    # hiddens = tf.transpose(hiddens, [1, 0, 2])
     return hiddens, states
 
 
@@ -49,7 +55,7 @@ def graph():
     keep_prob = tf.placeholder(tf.float32, name="keep_prob")
 
     # 可以看做隐藏层
-    hidden, states = single_layer_static_gru(x_input, n_steps, n_hidden[0])
+    hidden, states = single_layer_dynamic_gru(x_input, n_steps, n_hidden[0], seq_lens)
 
     # 取 RNN 最后一个时序的输出，然后经过全连接网络得到输出值
     hidden = tf.nn.dropout(hidden, keep_prob)
