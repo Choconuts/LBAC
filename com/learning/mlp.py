@@ -34,7 +34,7 @@ def full_conn_layer(input_layer, output_size, keep_prob=None, activate=None, nam
         h_fc = activate(d_fc)        # 激活函数
     else:
         h_fc = d_fc
-    h_fc = tf.nn.dropout(h_fc, keep_prob, name=name)
+    h_fc = tf.nn.dropout(h_fc, keep_prob=keep_prob, name=name)
     return h_fc
 
 

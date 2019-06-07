@@ -25,6 +25,7 @@ flags.DEFINE_integer('decay', None, 'start index')
 flags.DEFINE_float('rate', None, 'start index')
 flags.DEFINE_float('keep', None, 'start index')
 flags.DEFINE_bool('test', None, 'start index')
+flags.DEFINE_bool('no_test', None, 'start index')
 flags.DEFINE_string('name', None, 'start index')
 flags.DEFINE_multi_integer('hidden', None, 'start index')
 flags.DEFINE_integer('rnn_step', None, 'rnn step')
@@ -75,6 +76,8 @@ def main(argv):
         values = mapping.values()
         for v in values:
             change = getattr(FLAGS, v)
+            if change is None and v == 'test':
+                config[graph][v] = False
             if change is not None:
                 if v == 'gt':
                     if not hasattr(FLAGS, 'gt_dir'):
@@ -83,6 +86,9 @@ def main(argv):
                 if graph not in config:
                     config[graph] = dict()
                 config[graph][v] = change
+
+        if getattr(FLAGS, 'no_test'):
+            config[graph]['test'] = False
 
     if edit_config:
         save_json(config, get_dir('conf', 2))

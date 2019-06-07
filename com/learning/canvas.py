@@ -13,11 +13,11 @@ class Canvas:
         self.name = name
         self.path = path
 
-    def open(self, path=None):
+    def open(self, path=None, step=-1):
         tf.reset_default_graph()
         self.sess = tf.Session()
         if path is not None:
-            self.load(path)
+            self.load(path, step)
         return self.sess
 
     def save(self, path=None, write_meta_flag=False, step=-1):
