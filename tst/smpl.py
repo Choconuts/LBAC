@@ -33,13 +33,6 @@ class SMPLModel():
             for i in range(1, self.kintree_table.shape[1])
         }
 
-        # TODO
-        # self.parent[3] = 6
-        # self.parent[6] = 0
-        # self.parent[16] = 6
-        # self.parent[17] = 6
-        # self.parent[12] = 6
-
         self.pose_shape = [24, 3]
         self.beta_shape = [10]
         self.trans_shape = [3]

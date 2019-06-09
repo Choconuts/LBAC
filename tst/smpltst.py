@@ -10,6 +10,8 @@ def gen_body():
     pose = np.zeros((24, 3))
     pose[1] = np.array([0, 0, 0.3])
     pose[2] = np.array([0, 0, -0.3])
+    pose[13] = np.array([0, 0, 0.2])
+    pose[14] = np.array([0, 0, -0.2])
     smpl.set_params(pose=pose)
     m = Mesh()
     m.vertices = smpl.verts

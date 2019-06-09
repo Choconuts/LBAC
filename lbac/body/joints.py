@@ -6,7 +6,7 @@ from com.posture.imitator import *
 from com.mesh.simple_display import *
 from com.mesh.array_renderer import *
 
-
+# 3, 9, 13, 14 是没有的
 
 
 def draw_joints():

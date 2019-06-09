@@ -57,6 +57,7 @@ class Canvas:
             saver = tf.train.import_meta_graph(self.meta_file())
             saver.restore(self.sess, self.model_file())
             graph.restore()
+        graph.sess = self.sess
 
     def load(self, path=None, step=-1):
         if path is not None:

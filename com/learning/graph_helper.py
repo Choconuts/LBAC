@@ -102,6 +102,9 @@ class GraphBase:
             self.test_step(sess, ground_truth.get_test())
 
     def predict(self, sess: tf.Session, batch, index=0):
+        if sess is None:
+            sess = self.sess
+
         feed_dict = self.pack(self.predict_process(batch, False))
         return sess.run(self.outputs[index], feed_dict=feed_dict)
 
