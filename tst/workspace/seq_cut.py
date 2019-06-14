@@ -44,10 +44,11 @@ def process_seqs(seqs):
 
 def cut():
     in_file = conf_path('temp/128_r.json')
-    v_file = conf_path('temp/valid-seqs.json')
+    v_file = 'valid-20.json'
 
     valids = load_json(v_file)
     raw_data = load_json(in_file)
+    print(len(valids))
     data = []
     for v in valids:
         seq = raw_data[v]
