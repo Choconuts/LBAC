@@ -4,6 +4,7 @@ from com.path_helper import *
 import transforms3d as tr
 import math
 from tst.joint20.skeleton_nn import *
+from com.timer import Timer
 
 
 kinect_to_smpl = {
@@ -83,6 +84,7 @@ def save_20_joints():
 
 def show_joints(joints):
     def d():
+        draw_axis()
         glColor3f(1, 0.5, 0)
         glPointSize(5)
         glBegin(GL_POINTS)
@@ -94,13 +96,50 @@ def show_joints(joints):
     run_glut()
 
 
-def kinect_joints_to_smpl(kinect_joints, root_rot, graph):
-    smpl = SMPLModel(conf_path('smpl'))
+def compare_joints(joints1, joints2):
+    def d():
+        draw_axis()
+        glColor3f(1, 0.3, 0)
+        glPointSize(5)
+        glBegin(GL_POINTS)
+        for j in joints1:
+            glVertex3d(j[0], j[1], j[2])
+        glEnd()
+
+        glColor3f(0, 0.3, 1)
+        glPointSize(5)
+        glBegin(GL_POINTS)
+        for j in joints2:
+            glVertex3d(j[0], j[1], j[2])
+        glEnd()
+
+    set_display(d)
+    run_glut()
+
+
+def kinect_joints_to_smpl(kinect_joints, root_rot, graph, smpl):
+    timer = Timer()
+    if smpl is None:
+        smpl = SMPLModel(conf_path('smpl'))
     smpl_joints = np.zeros((24, 3))
+
+    kinect_joints[0] += 0.3 * (kinect_joints[1] - kinect_joints[0])
+
     for i in kinect_to_smpl:
         smpl_joints[kinect_to_smpl[i]] = kinect_joints[i]
 
     smpl_joints = process_joints(smpl_joints, root_rot)
+
+    timer.tick('preprocess')
+
+    # 将获得的关节点表示到右手坐标系下
+    root_mat = tr.euler.euler2mat(*root_rot)
+    root_mat[0, 2] *= -1
+    root_mat[1, 2] *= -1
+    root_mat[2, 0] *= -1
+    root_mat[2, 1] *= -1
+    root_rot = tr.euler.mat2euler(root_mat)
+    smpl_joints[:, 2] *= -1
 
     x = []
     for i in [6, 12, 16, 17]:
@@ -110,7 +149,11 @@ def kinect_joints_to_smpl(kinect_joints, root_rot, graph):
     for i in range(4):
         smpl_joints[mp[i]] = y[i]
 
-    pose = joints_to_smpl(smpl_joints, root_rot)
+    timer.tick('mlp')
+
+    pose = joints_to_smpl(smpl, smpl_joints, root_rot)
+
+    timer.tick('pose')
 
     def show():
         smpl.set_params(pose)
@@ -130,13 +173,16 @@ def kinect_joints_to_smpl(kinect_joints, root_rot, graph):
         set_display(d)
         run_glut()
 
-    # show()
+    # smpl.set_params(pose)
+    # joints = smpl.J
+    # weights = np.eye(24)
+    # joints = apply(smpl, weights, np.array(joints))
+    # compare_joints(smpl_joints, process_joints(joints, [0, 0, 0]))
 
     return pose
 
 
-def joints_to_smpl(smpl_joints, root_rot):
-    smpl = SMPLModel(conf_path('smpl'))
+def joints_to_smpl(smpl, smpl_joints, root_rot):
 
     def norm(vec):
         n = np.linalg.norm(vec)

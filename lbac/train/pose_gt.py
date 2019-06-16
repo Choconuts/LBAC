@@ -36,13 +36,19 @@ def gen_pose_gt_data(ext_dir, beta_dir, gt_dir, gen_range=None):
     for seq_idx in gen_range:
         frames = valid_dict[seq_idx]
         seq_idx = int(seq_idx)
-        seq_meta, frame_num, beta, poses = parse_sim(str5(seq_idx))
+        try:
+            seq_meta, frame_num, beta, poses = parse_sim(join(ext_dir, str5(seq_idx)))
+        except Exception as e:
+            print(seq_idx, e)
+            continue
+        print(seq_idx)
         if frames != frame_num:
             print('warning: invalid seq frames record')
             frames = frame_num
         disps = []
-        for i in range(frames):
+        for i in range(len(poses)):
             mesh_i = Mesh().load(join(ext_dir, str5(seq_idx), str4(i) + '.obj'))
+            print(frames, len(poses))
             disp = process(mesh_i, beta, poses[i])
             disps.append(disp)
         meta['index'][seq_idx] = len(disps)
@@ -51,6 +57,7 @@ def gen_pose_gt_data(ext_dir, beta_dir, gt_dir, gen_range=None):
         data['disps'] = np.array(disps).tolist()
         data['poses'] = poses
         data['beta'] = beta
+        print(join(gt_dir, str5(seq_idx) + '.json'))
         save_json(data, join(gt_dir, str5(seq_idx) + '.json'))
 
     save_json(meta, join(gt_dir, 'meta.json'))
@@ -74,16 +81,15 @@ def process(mesh, beta, pose):
     beta_id = -1
     for i in beta_gt.data['betas']:
         beta_i = np.array(beta_gt.data['betas'][i])
-        if beta_a == beta_i.all():
-            beta_id = i
+        if (beta_a == beta_i).all():
+            beta_id = int(i)
             break
 
     if beta_id < 0:
         print('warning: missing beta gt')
         return None
 
-
-    beta_disp = beta_gt.data['disps'][beta_id]
+    beta_disp = beta_gt.data['disps'][str(beta_id)]
 
     return disp - beta_disp
 

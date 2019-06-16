@@ -18,7 +18,7 @@ flags.DEFINE_string('mesh', None, 'path to cloth mesh')
 flags.DEFINE_string('type', 'pose', 'simulation type')
 flags.DEFINE_integer('s', 0, 'start index')
 flags.DEFINE_integer('e', -1, 'end index')
-flags.DEFINE_integer('m', 1, 'mode, 0 for display, 1 for offline')
+flags.DEFINE_integer('m', 1, 'mode, 0 for display, 1 for offline, 2 for resumeoffline, 3 for replay, -1 for not simulate')
 flags.DEFINE_integer('cloth', 0, 'cloth id in robe')
 flags.DEFINE_bool('no_ext', False, 'only extract simulation results')
 

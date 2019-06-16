@@ -23,7 +23,7 @@ def apply_view(view, rotate=True):
     glScalef(view.scale, view.scale, view.scale)
     if rotate:
         glRotatef(view.lat, 1, 0, 0)
-        glRotatef(view.lon, 0, 1, 0)
+        glRotatef(view.lon + 180, 0, 1, 0)
 
 
 class MouseState:
@@ -81,6 +81,19 @@ def ambient_light(a):
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, a4)
 
 
+def draw_axis():
+    for i in range(3):
+        x = [0, 0, 0]
+        x[i] = 1
+
+        glColor3f(*x)
+        glBegin(GL_LINES)
+        glVertex3f(0, 0, 0)
+        glVertex3f(*x)
+        glEnd()
+
+
+
 def draw_func():
     pass
 
@@ -109,6 +122,9 @@ def display():
     glEnable(GL_LIGHTING)
     glEnable(GL_NORMALIZE)
     directional_light(0, [0, 0, 1], [0.6, 0.6, 0.6])
+    directional_light(1, [0, 0, -1], [0.6, 0.6, 0.6])
+    directional_light(2, [1, 0, 0], [0.6, 0.6, 0.6])
+    directional_light(3, [-1, 0, 0], [0.6, 0.6, 0.6])
     ambient_light([0.3, 0.3, 0.3])
     apply_view(views[0])
 

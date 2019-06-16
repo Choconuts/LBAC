@@ -77,7 +77,7 @@ class SimExtractor:
             return valid_count
         seq_meta['seq_frames'] = seq_meta['frames']
         seq_meta['frames'] = valid_count
-        seq_meta['poses'] = seq_meta['poses'][skip: skip + valid_count]
+        seq_meta['poses'] = seq_meta['poses'][0:valid_count]
 
         save_json(seq_meta, join(ext_dir, 'meta.json'))
 

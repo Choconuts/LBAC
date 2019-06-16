@@ -28,13 +28,18 @@ def cancel_rotation(pose):
 
 
 if __name__ == '__main__':
-    obj = load_json(file)
+    # obj = load_json(file)
+    #
+    # for poses in obj:
+    #     for i in range(len(poses)):
+    #         poses[i] = cancel_rotation(poses[i])
+    #
+    # save_json(obj, 'seq_56_r.json')
 
-    for poses in obj:
-        for i in range(len(poses)):
-            poses[i] = cancel_rotation(poses[i])
+    """
+    """
 
-    save_json(obj, 'seq_56_r.json')
-
+    a = transforms3d.euler.axangle2euler((0, 0, 1), 3.15)
+    print(a)
 
 

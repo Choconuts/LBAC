@@ -99,7 +99,8 @@ def simulate(seq_reader: SeqReader, out_dir, cloth_id, sim_range, sim_mode=1, op
     m_sim_time = time.time()
     for i in sim_range:
         m_sim_range.append(i)
-        run_seq(i, option)
+        if m_sim_type >= 0:
+            run_seq(i, option)
 
     # 秒为单位
     m_sim_time = time.time() - m_sim_time
