@@ -45,7 +45,6 @@ def graph():
     # batch_size：表示一次的批次样本数量batch_size  n_steps：表示时间序列总数  n_input：表示一个时序具体的数据长度  即一共28个时序，一个时序送入28个数据进入 RNN 网络
     x_input = tf.placeholder(dtype=tf.float32, shape=[None, n_steps, n_input], name="x")
     y_true = tf.placeholder(dtype=tf.float32, shape=[None, n_steps, n_output], name="y")
-    seq_lens = tf.placeholder(tf.int32, shape=[None], name="length")
     keep_prob = tf.placeholder(tf.float32, name="keep_prob")
 
     # 可以看做隐藏层
@@ -76,7 +75,7 @@ def graph():
     # 预测结果评估
     pose_accuracy = cross_entropy  # 求损失
 
-    return [train_step], [x_input, keep_prob, y_true, seq_lens], None, cross_entropy, output[-1] # TODO
+    return [train_step], [x_input, keep_prob, y_true], None, cross_entropy, output[-1] # TODO
 
 
 def sequence_slice(seq, length):
@@ -90,8 +89,9 @@ def sequence_slice(seq, length):
 def batch_slice(batch):
     res = [[], [], []]
     for i in range(len(batch[0])):
-        res[0].append(sequence_slice(batch[0][i], batch[2][i]))
-        res[1].append(sequence_slice(batch[1][i], batch[2][i]))
+        # 注意，要改回动态必须改这里S！！！！！！
+        res[0].append(sequence_slice(batch[0][i], n_steps))
+        res[1].append(sequence_slice(batch[1][i], n_steps))
     res[0] = np.concatenate(res[0])
     res[1] = np.concatenate(res[1])
     for i in range(len(res[0])):
@@ -104,10 +104,8 @@ def batch_process(batch: list, is_train, local_step):
         return None
     batch[0] = np.array(batch[0]).reshape((batch_size, -1, n_input))
     batch[1] = np.array(batch[1]).reshape((batch_size, -1, n_output))
-    batch[2] = np.array(batch[2]).reshape((batch_size))
-    if batch[2][0] < n_steps:
-        return None
-    batch = batch_slice(batch)
+
+    # batch = batch_slice(batch)
     if batch is None:
         return None
 

@@ -73,6 +73,8 @@ def main(argv):
     if config is None:
         config = dict()
     for graph in graphs:
+        if graph not in config:
+            config[graph] = dict()
         values = mapping.values()
         for v in values:
             change = getattr(FLAGS, v)
@@ -83,8 +85,6 @@ def main(argv):
                     if not hasattr(FLAGS, 'gt_dir'):
                         print('warning: no gt dir entered')
                     change = [change, get_dir('gt_dir', 0)]
-                if graph not in config:
-                    config[graph] = dict()
                 config[graph][v] = change
 
         if getattr(FLAGS, 'no_test'):

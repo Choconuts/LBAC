@@ -100,12 +100,13 @@ class PoseSampleId(SampleId):
         coords = self.data[0][self.id]
         data = self.data[1][coords[0]]
         step = self.data[2]
+
         p = coords[1]
         poses = np.array(data['poses'][p:p+step]).reshape((step, -1))
-        beta = np.array(data['beta'][p:p+step]).reshape((step, -1))
+        beta = np.zeros((step, 1)) + np.array(data['beta']).reshape((1, -1))
         disps = np.array(data['disps'][p:p+step]).reshape((step, -1))
 
-        x = np.hstack(poses, beta)
+        x = np.hstack((poses, beta))
 
         return x, disps
 
@@ -144,7 +145,7 @@ class PoseGroundTruth(GroundTruth):
     def load_data(self, gt_dir):
         self.data = dict()
         for i in self.index:
-            self.data[i] = load_json(join(gt_dir, str5(i) + '.json'))
+            self.data[i] = load_json(join(gt_dir, str5(int(i)) + '.json'))
 
     def get_batch(self, size):
         last = self.batch_manager.pointer
