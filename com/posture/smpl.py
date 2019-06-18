@@ -87,6 +87,7 @@ class SMPLModel():
             self.update()
         if no_return:
             return
+        return self.verts, self.faces
 
     def update_R_and_G(self):
         # rotation matrix for each joint

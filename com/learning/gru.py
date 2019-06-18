@@ -127,11 +127,10 @@ def predict_process(batch: list, is_test):
         return batch
     if len(batch[0]) < n_steps:
         return None
-    batch[0] = np.array(batch[0])[:, -n_steps:].reshape((-1, n_steps, n_input))
+    batch[0] = np.array(batch[0])[-n_steps:].reshape((-1, n_steps, n_input))
     batch.insert(1, 1)
     batch.insert(2, None)
-    batch.insert(3, [n_steps])
-    return batch[0:4]
+    return batch[0:3]
 
 
 def bind(g: GraphBase):

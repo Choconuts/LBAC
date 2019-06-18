@@ -98,7 +98,5 @@ class SimExtractor:
             json.dump(self.meta, fp)
 
 
-
-
 if __name__ == '__main__':
     print(str4(-2))
