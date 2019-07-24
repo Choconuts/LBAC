@@ -128,7 +128,7 @@ class VirtualFitting:
         timer.tick('smpl')
         self.reset_cloth(False)
         timer.tick('reset')
-        # self.cloth.vertices += self.pose_regressor.gen(self.beta, self.pose)
+        self.cloth.vertices += self.pose_regressor.gen(self.beta, self.pose)
         timer.tick('diff')
         self.apply_pose()
         timer.tick('pose')
