@@ -103,6 +103,26 @@ class VirtualFitting:
             cloth.vertices[i] += cn * 0.004 + bn * 0.004
         self.cloth = cloth
 
+    def post_processing_2(self):
+        cloth = self.cloth
+        body = self.body
+        rela = self.relation.calc_rela_once(cloth, body)
+
+        # to the close skin
+        for i in range(len(cloth.vertices)):
+            vc = cloth.vertices[i]
+            vb = body.vertices[rela[i]]
+            bn = body.normal[rela[i]]
+            cloth.vertices[i] += bn * (np.dot(vb - vc, bn) + 0.01)
+
+        # cloth.update_normal_only()
+        # for i in range(len(cloth.vertices)):
+        #     cn = cloth.normal[i]
+        #     bn = body.normal[rela[i]]
+        #     cloth.vertices[i] += cn * 0.004 + bn * 0.004
+
+        self.cloth = cloth
+
     def update(self):
         timer = Timer(False)
         self.smpl.set_params(self.pose, self.beta, self.trans, True)

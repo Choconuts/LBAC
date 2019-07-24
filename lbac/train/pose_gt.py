@@ -8,10 +8,12 @@ from com.posture.smpl import *
 
 beta_gt = BetaGroundTruth()
 relation = ClosestVertex()
-smpl = SMPLModel(conf_path('smpl'))
+smpl = None
 
 
 def gen_pose_gt_data(ext_dir, beta_dir, gt_dir, gen_range=None):
+    global smpl
+    smpl = SMPLModel(conf_path('smpl'))
     meta, valid_dict = parse_ext(ext_dir)
 
     sim_type = meta['config']['type']
@@ -100,11 +102,22 @@ class PoseSampleId(SampleId):
         coords = self.data[0][self.id]
         data = self.data[1][coords[0]]
         step = self.data[2]
+        stride = self.data[3]
 
         p = coords[1]
-        poses = np.array(data['poses'][p:p+step]).reshape((step, -1))
         beta = np.zeros((step, 1)) + np.array(data['beta']).reshape((1, -1))
+        poses = np.array(data['poses'][p:p+step]).reshape((step, -1))
         disps = np.array(data['disps'][p:p+step]).reshape((step, -1))
+
+        # stride
+        poses = []
+        for i in range(step):
+            poses.append(data['poses'][p + i * stride])
+        poses = np.array(poses).reshape((step, -1))
+        disps = []
+        for i in range(step):
+            disps.append(data['disps'][p + i * stride])
+        disps = np.array(disps).reshape((step, -1))
 
         x = np.hstack((poses, beta))
 
@@ -112,10 +125,11 @@ class PoseSampleId(SampleId):
 
 
 class PoseGroundTruth(GroundTruth):
-    def __init__(self, step=5, cut_off=10):
+    def __init__(self, step=5, cut_off=10, stride=1):
         self.step = step
         self.mapping = []
         self.test_cut = cut_off
+        self.stride = stride
 
     def load(self, gt_dir):
         self.meta = load_json(join(gt_dir, 'meta.json'))
@@ -124,8 +138,11 @@ class PoseGroundTruth(GroundTruth):
         total = 0
         for i in index:
             if index[i] < self.step:
+                # 序列的帧数小于step，舍弃
                 continue
-            new_index[i] = index[i] - self.step + 1
+            # 序列的有效数量不再是帧数，而是能够向后取出step个帧的起始帧数目
+            # 修改后应该可以往后取出跳过stride的共计step的数目
+            new_index[i] = index[i] - self.step * self.stride + 1 * self.stride
             total += new_index[i]
             for j in range(new_index[i]):
                 self.mapping.append((i, j))
@@ -136,8 +153,9 @@ class PoseGroundTruth(GroundTruth):
 
         self.load_data(gt_dir)
 
+        data = (self.mapping, self.data, self.step, self.stride)
         for i in range(len(self.mapping)):
-            sample = PoseSampleId(i, (self.mapping, self.data, self.step))
+            sample = PoseSampleId(i, data)
             self.samples.append(sample)
 
         return self
