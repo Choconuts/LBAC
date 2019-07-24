@@ -125,6 +125,18 @@ class PoseSampleId(SampleId):
 
 
 class PoseGroundTruth(GroundTruth):
+    """
+    structure:
+    [{ id: (seqs, different length)
+        {
+         disps
+         poses
+         beta}
+    }...]
+
+    dereference method:
+
+    """
     def __init__(self, step=5, cut_off=10, stride=1):
         self.step = step
         self.mapping = []
