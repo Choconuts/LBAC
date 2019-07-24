@@ -83,6 +83,18 @@ def run_seq(i, option):
     os.system(sim(conf_tmp(i), out_path(i), m_sim_type))
 
 
+def set_simulate_param(seq_reader: SeqReader, out_dir, cloth_id, sim_range, sim_mode=1):
+    global m_out_dir, m_cloth_id, m_sim_type, m_seq_reader, m_sim_range, m_sim_time
+    m_out_dir = out_dir
+    m_cloth_id = cloth_id
+    m_sim_type = sim_mode
+    m_seq_reader = seq_reader
+    m_sim_range = []
+    for i in sim_range:
+        m_sim_range.append(i)
+    m_sim_time = 0
+
+
 def simulate(seq_reader: SeqReader, out_dir, cloth_id, sim_range, sim_mode=1, option=None):
     global m_out_dir, m_cloth_id, m_sim_type, m_seq_reader, m_sim_range, m_sim_time
     m_out_dir = out_dir
@@ -108,6 +120,8 @@ def simulate(seq_reader: SeqReader, out_dir, cloth_id, sim_range, sim_mode=1, op
 
 
 def extract_results(extract_dir, sim_type, seq_reader=None):
+    if not exists(extract_dir):
+        os.makedirs(extract_dir)
     config = dict()
     config['cloth'] = m_cloth_id
     config['sim_range'] = m_sim_range

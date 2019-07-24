@@ -1,10 +1,13 @@
 import numpy as np
 from com.path_helper import *
 import math
+import copy
+
+mini_float = 1e-5
 
 
 class Sequence:
-    def __init__(self, time_step, typ=''):
+    def __init__(self, time_step=0.1, typ=''):
        self.time_step = time_step
        self.type = typ
        self.meta = dict()
@@ -26,7 +29,7 @@ class Sequence:
             obj['time_step'] = self.time_step
             obj['type'] = self.type
             obj['meta'] = self.meta
-            obj['data'] = self.data.tolist()
+            obj['data'] = self.data
             save_json(obj, path)
         else:
             if not exists(path):
@@ -39,8 +42,9 @@ class Sequence:
             for i in range(len(self.data)):
                 frame = self.data[i]
                 if type(frame) == np.ndarray:
-                    frame = frame.tolist()
+                    frame = frame
                 save_json(frame, join(path, self.frame_name(i) + '.json'))
+        return self
 
     def load(self, path, load_as_dir=False):
         if not exists(path):
@@ -67,23 +71,44 @@ class Sequence:
 
                 self.data.append(frame)
             self.data = np.array(self.data)
+        return self
 
     def get_shot_at(self, time):
         index = math.floor(time / self.time_step)
         if index == len(self.data) - 1:
             return self.data[index]
-        offset = time % self.time_step
+        offset = time  - index * self.time_step
         t = offset / self.time_step
         return self.data[index] * (1 - t) + self.data[index + 1] * t
 
     def get_frame_rate(self):
         return 1 / self.time_step
 
-    def set_frame_rate(self, rate):
-        self.time_step = 1 / rate
+    def set_frame_rate(self, rate, re_sample=False):
+        time_step = 1 / rate
+        if re_sample:
+            self.re_sampling(time_step)
+        else:
+            self.time_step = time_step
+        return self
 
-    def down_sampling(self, times):
-        raise Exception("not implement")
+    def re_sampling(self, new_time_step):
+        data = []
+        current = 0
+        while current < self.get_total_time() - mini_float:
+            data.append(self.get_shot_at(current))
+            current += new_time_step
+
+        self.data = np.array(data)
+        self.time_step = new_time_step
+        return self
+
+    def copy(self):
+        new_seq = Sequence(self.time_step, self.type)
+        new_seq.meta = copy.deepcopy(self.meta)
+        new_seq.data = copy.deepcopy(self.data)
+        return new_seq
+
 
 
 

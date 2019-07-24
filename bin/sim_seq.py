@@ -21,6 +21,7 @@ flags.DEFINE_integer('e', -1, 'end index')
 flags.DEFINE_integer('m', 1, 'mode, 0 for display, 1 for offline, 2 for resumeoffline, 3 for replay, -1 for not simulate')
 flags.DEFINE_integer('cloth', 0, 'cloth id in robe')
 flags.DEFINE_bool('no_ext', False, 'only extract simulation results')
+flags.DEFINE_bool('no_sim', False, 'only extract results')
 
 
 def get_dir(key, i):
@@ -51,6 +52,11 @@ def main(argv):
     seq_reader = SeqReader(in_dir)
     if end < 0:
         end = seq_reader.seq_num
+    if getattr(FLAGS, 'no_sim'):
+        set_simulate_param(seq_reader, sim_dir, cloth_id, range(start, end), mode)
+        extract_results(out_dir, sim_type, seq_reader)
+        return
+
     res = simulate(seq_reader, sim_dir, cloth_id, range(start, end), mode)
     if res and not getattr(FLAGS, 'no_ext'):
         extract_results(out_dir, sim_type)
