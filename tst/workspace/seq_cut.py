@@ -12,6 +12,7 @@ from com.posture.smpl import *
 
 angle = 10
 
+
 def rotate(mat, ax, angle):
     rot = transforms3d.axangles.axangle2mat(ax, math.radians(angle))
     return np.matmul(rot, mat)

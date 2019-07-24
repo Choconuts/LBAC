@@ -1,5 +1,6 @@
 from com.learning.canvas import *
 from com.learning.graph_helper import *
+from lbac.train.ex_shape_gt import *
 from com.mesh.mesh import *
 from com.mesh.smooth import *
 from com.posture.smpl import *
@@ -19,12 +20,15 @@ def batch(beta):
 def init():
     smpl = SMPLModel(conf_path('model/smpl/male.pkl'))
     canvas = Canvas()
-    sess = canvas.open('../../db/model/ex/beta/2', 3000)
+    sess = canvas.open('../../db/model/ex/beta/5')
     g = GraphBase('mlp').restore()
-    cloth = Mesh().load('../../db/gt/ex/beta/1/template.obj')
-    beta = gen_random_beta(0)
-    beta += [-2, 0 ,0 ,0]
+    cloth = Mesh().load('../../db/gt/ex/beta/2019-6-19/template.obj')
+    beta = gen_random_beta(2)
     diff = g.predict(sess, batch(beta)).reshape(-1, 3)
+
+    # beta_gt = BetaGroundTruth().load('../../db/gt/ex/beta/2019-6-19')
+    # diff = np.array(beta_gt.data['disps']['0']).reshape((-1, 3))
+
     cloth.vertices += diff
     cloth.update()
     beta0 = np.zeros(10)

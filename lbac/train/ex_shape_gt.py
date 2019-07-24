@@ -10,6 +10,10 @@ betas = np.zeros(0)
 zero_shape_index = -1
 
 ex_dir = conf_path('exter/')
+cloth_dir = 'shapeModel2019-6-19'
+topo_file = 'triangles_clt.txt'
+
+faces = np.zeros(0)
 
 
 def txt_to_array_3(txt_file, dtype):
@@ -65,16 +69,19 @@ def load_betas():
 
 def ex_beta_mesh(i):
     cloth_file = 'cloth_' + str3(i) + '.txt'
-    cloth_file = join(ex_dir, 'shapeModel_clothing', cloth_file)
+    cloth_file = join(ex_dir, cloth_dir, cloth_file)
     vertices = txt_to_array_3(cloth_file, 'f')
-    faces = txt_to_array_3(join(ex_dir, 'triangles.txt'), 'i')
-    faces -= 1
+    global faces
+    if faces is None or len(faces) == 0:
+        faces = txt_to_array_3(join(ex_dir, topo_file), 'i')
+    # faces -= 1
     mesh = Mesh().from_vertices(vertices, faces)
     mesh.update()
     return mesh
 
 
 def gen_beta_gt_data(gt_dir):
+    print(gt_dir)
 
     vertices = dict()
 
@@ -173,7 +180,9 @@ if __name__ == '__main__':
     """
     """
     # tst()
-    set_smooth_times(5)
-    mesh = ex_beta_mesh(0)
-    smooth_mesh(mesh)
-    mesh.save(conf_path('smooth.obj', 'tst'))
+    # set_smooth_times(5)
+    # mesh = ex_beta_mesh(0)
+    # smooth_mesh(mesh)
+    # mesh.save(conf_path('smooth.obj', 'tst'))
+    load_betas()
+    gen_beta_gt_data(conf_path('gt/ex/beta/2019-6-19'))
