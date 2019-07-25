@@ -13,6 +13,7 @@ time_counter = 0
 last_draw_frame = -1
 real_timing = True
 mesh_color = [0.5, 0.8, 1]
+mesh_colors = [[0.5, 0.8, 1], [0.7, 0.7, 0.7], [0.9, 0.2, 0.6]]
 beta_gt = None
 relation = None
 cloth_weights = None
@@ -41,7 +42,7 @@ def read_vertex_relation(path=None):
             cloth_weights[i] = read_smpl().weights[rela[i]]
 
 
-def show_sequence_mesh(seq: Sequence, mesh, mesh_changer):
+def show_sequence_mesh(seq: Sequence, meshes, meshes_changer):
     global frame_counter, time_counter, last_draw_frame
     frame_counter = 0
     tot_frame = seq.get_frame_num()
@@ -50,18 +51,6 @@ def show_sequence_mesh(seq: Sequence, mesh, mesh_changer):
     print('total time: %f' % tot_time)
     start_time = time.time()
     last_draw_frame = -1
-
-    from com.timer import Timer
-
-    # meshes = []
-    # for i in range(tot_frame):
-    #     print(i)
-    #     tm = Timer()
-    #     m = Mesh(mesh)
-    #     tm.tick()
-    #     mesh_changer(m, seq.data[i])
-    #     tm.tick()
-    #     meshes.append(m)
 
     def idle():
         global frame_counter, time_counter
@@ -73,21 +62,26 @@ def show_sequence_mesh(seq: Sequence, mesh, mesh_changer):
         if real_timing:
             next_frame = int(math.floor(time_counter / seq.time_step))
             if next_frame != last_draw_frame:
-                mesh_changer(msr.mesh, seq.data[next_frame])
+                meshes_changer(seq.data[next_frame])
                 # msr.mesh = meshes[next_frame]
                 last_draw_frame = next_frame
                 glutPostRedisplay()
         else:
-            mesh_changer(mesh, seq.data[frame_counter])
+            meshes_changer(seq.data[frame_counter])
             glutPostRedisplay()
 
     def draw():
-        msr.render()
+        for msr in msrs:
+            msr.render()
 
     def init():
         init_array_renderer()
 
-    msr = MeshRenderer(mesh, mesh_color)
+    msrs = []
+    i = 0
+    for mesh in meshes:
+        msrs.append(MeshRenderer(mesh, mesh_colors[i]))
+        i += 1
     set_init(init)
     set_callbacks(idle)
     set_display(draw)
@@ -214,7 +208,8 @@ def show_pose_seq(pose_seq):
     show_sequence_mesh(pose_seq, mesh, mesh_changer)
 
 
-def show_seqs(beta: np.ndarray = None, pose_seq: Sequence = None, beta_disp: np.ndarray = None, pose_disp_seq: Sequence = None):
+def show_seqs(beta: np.ndarray = None, pose_seq: Sequence = None, beta_disp: np.ndarray = None,
+              pose_disp_seq: Sequence = None, show_body: bool = False):
     global beta_gt
     if beta_gt is None:
         beta_gt = BetaGroundTruth().load(conf_path('beta_gt'))
@@ -233,9 +228,20 @@ def show_seqs(beta: np.ndarray = None, pose_seq: Sequence = None, beta_disp: np.
     index_seq = Sequence()
     index_seq.data = np.linspace(0, frame_num - 1, frame_num)
 
-    def mesh_process(mesh, i):
+    meshes = [Mesh(beta_gt.template)]
+
+    smpl_verts = []
+    if show_body:
+        smpl = read_smpl()
+        meshes.append(Mesh().from_vertices(smpl.verts, smpl.faces))
+        for i in range(len(pose_seq.data)):
+            smpl.set_params(pose=pose_seq.data[i], beta=beta)
+            smpl_verts.append(smpl.verts)
+
+    def mesh_process(i):
+        mesh = meshes[0]
         i = int(i)
-        # pose disp
+
         mesh.vertices = np.copy(verts_temp)
         update_normal_flag = False
         if pose_disp_seq:
@@ -248,23 +254,27 @@ def show_seqs(beta: np.ndarray = None, pose_seq: Sequence = None, beta_disp: np.
             read_vertex_relation()
             smpl.set_params(pose=pose_seq.data[i], beta=beta, mat_only=True)
             mesh.vertices = apply(smpl, cloth_weights, mesh.vertices)
+            if show_body:
+                body = meshes[1]
+                body.vertices = smpl_verts[i]
+                body.update_normal_only()
         if update_normal_flag:
             mesh.update_normal_only()
         return mesh
 
-    show_sequence_mesh(index_seq, Mesh(beta_gt.template), mesh_process)
+    show_sequence_mesh(index_seq, meshes, mesh_process)
 
 
-def show_disps(pose_disp_seq):
-    global beta_gt
-    if beta_gt is None:
-        beta_gt = BetaGroundTruth().load(conf_path('beta_gt'))
-
-    verts_temp = np.copy(beta_gt.template.vertices)
-
-    def get_disped_mesh(mesh, shot):
-        mesh.vertices = verts_temp + shot.reshape(-1, 3)
-    show_sequence_mesh(pose_disp_seq, Mesh(beta_gt.template), get_disped_mesh)
+# def show_disps(pose_disp_seq):
+#     global beta_gt
+#     if beta_gt is None:
+#         beta_gt = BetaGroundTruth().load(conf_path('beta_gt'))
+#
+#     verts_temp = np.copy(beta_gt.template.vertices)
+#
+#     def get_disped_mesh(mesh, shot):
+#         mesh.vertices = verts_temp + shot.reshape(-1, 3)
+#     show_sequence_mesh(pose_disp_seq, [Mesh(beta_gt.template)], get_disped_mesh)
 
 
 if __name__ == '__main__':

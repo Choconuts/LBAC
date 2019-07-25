@@ -105,22 +105,34 @@ def seq_middle_lerp(pose_seq: Sequence):
 
 
 if __name__ == '__main__':
-    path = '../../tst/test_show_pose_seq.json'
+    path = '../../tst/test_show_pose_seq2.json'
     model = conf_path('model/sgru/adj-2')
     pose_seq = Sequence().load(path)
     pose_seq0 = pose_seq.copy()
+
+    # 显示帧差距
+    # pose_seq0.time_step = 2
+    # pose_seq.time_step = 2
+    # pose_seq.data = pose_seq.data[1:]
+
+
     # 序列的测试处理
-    turbulent_pos_sequence(pose_seq)
-    seq_middle_lerp(pose_seq)
-    pose_seq.re_sampling(0.13)
-    pose_seq.slice(0.4, 1000)
+    # turbulent_pos_sequence(pose_seq)
+    # seq_middle_lerp(pose_seq)
+    # pose_seq.re_sampling(0.13)
+    # pose_seq.slice(0.4, 1000)
+
+    # rdmpose = np.random.random((24, 3)) * 0.1 - 0.05
+    # for i in range(100):
+    #     pose_seq.data[i] += np.copy(rdmpose)
+    # pose_seq.time_step = 0.033
 
     # 检查关节运动
-    # show_pose_seq_joints(pose_seq)
+    # show_pose_seq_joints(pose_seq0)
     # show_multi_pose_seq_joints([pose_seq0, pose_seq])
 
     disp = predict_pose(pose_seq, model)
     # show_disps(disp)
     print(disp.data)
-    show_seqs(pose_disp_seq=disp, pose_seq=pose_seq)
+    show_seqs(pose_disp_seq=disp, pose_seq=pose_seq, show_body=True)
 

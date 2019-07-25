@@ -30,10 +30,10 @@ def test_seq():
 
 
 def test_show_seq():
-    path = '../../tst/test_show_pose_seq.json'
+    path = '../../tst/test_show_pose_seq2.json'
     if not exists(path):
         pose_gt = PoseGroundTruth().load(conf_path('gt/pose/1'))
-        obj = pose_gt.data[list(pose_gt.index.keys())[3]]
+        obj = pose_gt.data[list(pose_gt.index.keys())[1]]
         pose_seq = Sequence(0.033, 'pose')
         pose_seq.meta['beta'] = obj['beta']
         pose_seq.data = obj['poses']
