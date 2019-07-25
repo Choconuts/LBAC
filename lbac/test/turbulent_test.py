@@ -61,8 +61,8 @@ def turbulent_pos_sequence(pos_seq: Sequence):
     """
     pos_seq.data = pos_seq.data.reshape(-1, 24, 3)
     pos_seq.data[:, 17, 0] += 0.05
-    pos_seq.data[:, 17, 2] -= 0.02
-    pos_seq.data[:, 17, 1] += 0.01
+    pos_seq.data[:, 17, 2] -= 0.1
+    pos_seq.data[:, 17, 1] += 0.1
 
 
 def predict_pose(pose_seq: Sequence, model_dir=None):
@@ -106,9 +106,21 @@ def seq_middle_lerp(pose_seq: Sequence):
 
 if __name__ == '__main__':
     path = '../../tst/test_show_pose_seq.json'
-    # pose_seq = Sequence().load(path)
-    # show_pose_seq_joints(lerp_pose_seq(pose_seq))
-    seq = Sequence()
-    seq.data = np.linspace([1, 4], [10, 13], 10)
-    print(seq_middle_lerp(seq).data)
+    model = conf_path('model/sgru/adj-2')
+    pose_seq = Sequence().load(path)
+    pose_seq0 = pose_seq.copy()
+    # 序列的测试处理
+    turbulent_pos_sequence(pose_seq)
+    seq_middle_lerp(pose_seq)
+    pose_seq.re_sampling(0.13)
+    pose_seq.slice(0.4, 1000)
+
+    # 检查关节运动
+    # show_pose_seq_joints(pose_seq)
+    # show_multi_pose_seq_joints([pose_seq0, pose_seq])
+
+    disp = predict_pose(pose_seq, model)
+    # show_disps(disp)
+    print(disp.data)
+    show_seqs(pose_disp_seq=disp, pose_seq=pose_seq)
 

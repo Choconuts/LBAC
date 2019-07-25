@@ -144,6 +144,37 @@ class PoseGroundTruth(GroundTruth):
         self.stride = stride
 
     def load(self, gt_dir):
+        # self.meta = load_json(join(gt_dir, 'meta.json'))
+        # index = self.meta['index']
+        # new_index = dict()
+        # total = 0
+        # for i in index:
+        #     if index[i] < self.step:
+        #         # 序列的帧数小于step，舍弃
+        #         continue
+        #     # 序列的有效数量不再是帧数，而是能够向后取出step个帧的起始帧数目
+        #     # 修改后应该可以往后取出跳过stride的共计step的数目
+        #     new_index[i] = index[i] - self.step * self.stride + 1 * self.stride
+        #     total += new_index[i]
+        #     for j in range(new_index[i]):
+        #         self.mapping.append((i, j))
+        # max_num = total
+        # self.batch_manager = BatchManager(max_num, max_num - self.test_cut)
+        # self.samples = []
+        # self.index = new_index
+
+        self.load_meta(gt_dir)
+
+        self.load_data(gt_dir)
+
+        data = (self.mapping, self.data, self.step, self.stride)
+        for i in range(len(self.mapping)):
+            sample = PoseSampleId(i, data)
+            self.samples.append(sample)
+
+        return self
+
+    def load_meta(self, gt_dir):
         self.meta = load_json(join(gt_dir, 'meta.json'))
         index = self.meta['index']
         new_index = dict()
@@ -162,15 +193,6 @@ class PoseGroundTruth(GroundTruth):
         self.batch_manager = BatchManager(max_num, max_num - self.test_cut)
         self.samples = []
         self.index = new_index
-
-        self.load_data(gt_dir)
-
-        data = (self.mapping, self.data, self.step, self.stride)
-        for i in range(len(self.mapping)):
-            sample = PoseSampleId(i, data)
-            self.samples.append(sample)
-
-        return self
 
     def load_data(self, gt_dir):
         self.data = dict()

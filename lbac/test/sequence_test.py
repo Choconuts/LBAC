@@ -25,6 +25,8 @@ def test_seq():
     seq2.data = seq2.data[1:]
     seq2.re_sampling(0.1)
     print(seq2.data)
+    seq.slice(0.05, 0.7)
+    print(seq.data)
 
 
 def test_show_seq():

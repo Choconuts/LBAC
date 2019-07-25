@@ -109,6 +109,27 @@ class Sequence:
         new_seq.data = copy.deepcopy(self.data)
         return new_seq
 
+    def slice(self, start_time, end_time):
+        if start_time < 0:
+            print('warning: slice out of range')
+            start_time = 0
+        if end_time > self.get_total_time():
+            print('warning: slice out of range')
+            end_time = self.get_total_time()
+        current = start_time
+        data = []
+        while current < end_time:
+            data.append(self.get_shot_at(current))
+            current += self.time_step
+
+        self.data = np.array(data)
+        return self
+
+    def __repr__(self):
+        return self.meta.__repr__() + '\n' + self.data.__repr__()
 
 
-
+def link(seqs, upper_sampling=False):
+    time_step = -1
+    typ = None
+    raise Exception("not implemented")
