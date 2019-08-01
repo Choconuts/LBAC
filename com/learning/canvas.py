@@ -59,6 +59,19 @@ class Canvas:
             graph.restore()
         graph.sess = self.sess
 
+    def load_graph_of_step(self, path, graph, step=None):
+        self.path = path
+        g1 = tf.Graph()
+        self.sess = tf.Session(graph=g1)
+        with g1.as_default():
+            saver = tf.train.import_meta_graph(self.meta_file())
+            if step is not None:
+                saver.restore(self.sess, self.step_file(step))
+            else:
+                saver.restore(self.sess, self.model_file())
+            graph.restore()
+        graph.sess = self.sess
+
     def load(self, path=None, step=-1):
         if path is not None:
             self.path = path

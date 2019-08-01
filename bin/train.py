@@ -5,11 +5,13 @@ from absl import flags
 import os
 from com.path_helper import *
 from com.learning.canvas import Canvas
+from com.timer import timing
 
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('conf', join(get_base('conf'), 'train.json'), 'default configuration')
-flags.DEFINE_bool('c', False, 'edit config')
+flags.DEFINE_string('c', None, 'edit config')
+flags.DEFINE_bool('t', False, 'train or not')
 flags.DEFINE_integer('l', None, 'loading and continue')
 flags.DEFINE_string('out', None, 'out put dir')
 flags.DEFINE_string('dir', 'rrr', 'r(relative) a(absolute), or d(relative to db), default d, in-out-conf')
@@ -25,8 +27,11 @@ flags.DEFINE_integer('decay', None, 'start index')
 flags.DEFINE_float('rate', None, 'start index')
 flags.DEFINE_float('keep', None, 'start index')
 flags.DEFINE_bool('test', None, 'start index')
+flags.DEFINE_integer('test_cut', None, 'start index')
 flags.DEFINE_bool('no_test', None, 'start index')
 flags.DEFINE_string('name', None, 'start index')
+flags.DEFINE_float('l1', 0, 'regular')
+flags.DEFINE_float('l2', 0, 'regular')
 flags.DEFINE_multi_integer('hidden', None, 'start index')
 flags.DEFINE_integer('rnn_step', None, 'rnn step')
 flags.DEFINE_integer('save', None, 'save step')
@@ -48,6 +53,9 @@ mapping = {
     "test_flag": "test",
     "graph_id": "name",
     "gt": "gt",
+    "l1_regular_scale": "l1",
+    "l2_regular_scale": "l2",
+    "test_cut": "test_cut"
 }
 
 def get_dir(key, i):
@@ -61,11 +69,17 @@ def get_dir(key, i):
     return m_dir
 
 
+@timing
 def main(argv):
     del argv
 
-    edit_config = FLAGS.c
-    config = load_json(get_dir('conf', 2))
+    edit_config_file = FLAGS.c
+    train_flag = FLAGS.t
+    test_cut = FLAGS.test_cut
+    if edit_config_file and exists(edit_config_file):
+        config = load_json(conf_path(edit_config_file + '.json','conf'))
+    else:
+        config = load_json(get_dir('conf', 2))
     graphs = FLAGS.g
     output_dir = get_dir('out', 1)
     load_step = FLAGS.l
@@ -90,9 +104,11 @@ def main(argv):
         if getattr(FLAGS, 'no_test'):
             config[graph]['test'] = False
 
-    if edit_config:
-        save_json(config, get_dir('conf', 2))
-    else:
+        print('config: ', config[graph])
+
+    if edit_config_file:
+        save_json(config, conf_path(edit_config_file + '.json','conf'))
+    if train_flag:
         def set_attributes(module):
             for key in mapping:
                 if mapping[key] in config[graph]:
@@ -123,11 +139,14 @@ def main(argv):
             module = getattr(th, graph)
             print('config: ', config[graph])
             gt = getattr(th, str(config[graph]['gt'][0])).load(config[graph]['gt'][1])
+            if "test_cut" in config[graph]:
+                gt.batch_manager.cut(gt.batch_manager.max_num - config[graph]["test_cut"])
             train(module, gt)
 
 
 if __name__ == '__main__':
     app.run(main)
+
 
 
 

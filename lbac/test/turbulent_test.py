@@ -20,6 +20,8 @@ pose_regressor = None
 
 canvas = None
 
+model = None
+
 
 def get_canvas():
     global canvas
@@ -73,7 +75,7 @@ def predict_pose(pose_seq: Sequence, model_dir=None):
     :return: pose_disp序列
     """
     assert pose_seq.type == 'pose'
-    global test_model_dir
+    global test_model_dir, pose_regressor
     beta = [0, 0, 0, 0]
     if 'beta' in pose_seq.meta:
         beta = np.array(pose_seq.meta['beta'])
@@ -105,8 +107,11 @@ def seq_middle_lerp(pose_seq: Sequence):
 
 
 if __name__ == '__main__':
-    path = '../../tst/test_show_pose_seq2.json'
-    model = conf_path('model/sgru/adj-2')
+    path = '../../tst/tst_seqs/test_pose_18.json'
+    model = conf_path('../../LBAC-EXDB/adj-3')
+    model = r'D:\Educate\CAD-CG\GitProjects\adj-sm'
+    model = conf_path('model/sgru/3')
+    model = r'D:\Educate\CAD-CG\GitProjects\mae-1'
     pose_seq = Sequence().load(path)
     pose_seq0 = pose_seq.copy()
 
@@ -115,17 +120,18 @@ if __name__ == '__main__':
     # pose_seq.time_step = 2
     # pose_seq.data = pose_seq.data[1:]
 
+    # print(len(pose_seq.data))
 
     # 序列的测试处理
-    # turbulent_pos_sequence(pose_seq)
-    # seq_middle_lerp(pose_seq)
-    # pose_seq.re_sampling(0.13)
-    # pose_seq.slice(0.4, 1000)
+    turbulent_pos_sequence(pose_seq)
+    seq_middle_lerp(pose_seq)
+    pose_seq.re_sampling(0.044)
+    pose_seq.slice(0.1, 1000)
 
-    # rdmpose = np.random.random((24, 3)) * 0.1 - 0.05
-    # for i in range(100):
-    #     pose_seq.data[i] += np.copy(rdmpose)
-    # pose_seq.time_step = 0.033
+    rdmpose = np.random.random((24, 3)) * 0.4 - 0.2
+    for i in range(pose_seq.get_frame_num()):
+        pose_seq.data[i] += np.copy(rdmpose)
+    pose_seq.time_step = 0.033
 
     # 检查关节运动
     # show_pose_seq_joints(pose_seq0)
@@ -134,5 +140,7 @@ if __name__ == '__main__':
     disp = predict_pose(pose_seq, model)
     # show_disps(disp)
     print(disp.data)
-    show_seqs(pose_disp_seq=disp, pose_seq=pose_seq, show_body=True)
+    show_seqs(pose_disp_seq=disp,
+              pose_seq=pose_seq,
+              show_body=False)
 

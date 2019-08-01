@@ -1,6 +1,7 @@
 import numpy as np
 import time
-
+from com.mesh.mesh import *
+import math
 
 def get_closest_points(cloth, body):
     """
@@ -9,7 +10,6 @@ def get_closest_points(cloth, body):
     :return: 每个衣服顶点最近的人体顶点标号的列表
     """
     # hash the body
-    import math
     class LinearFunc:
         """
         先用二次把
@@ -150,6 +150,118 @@ class Timer:
         return time.time() - self.last_time
 
 
+def get_closest_faces(cloth: Mesh, body: Mesh):
+    grid_width = 0.015
+
+    def gridify(x):
+        return np.floor(x / grid_width).astype('i')
+
+    def reduce(func1, func2):
+        return func1(func2(cloth.vertices), func2(body.vertices))
+    min_coord = reduce(min, np.min)
+    bias = 0    # 让所有坐标都大于等于0
+    if min_coord < 0:
+        bias = -min_coord
+    # 不会超过的id值
+    power_limit = gridify(reduce(max, np.max) + bias) + 1
+
+    print(power_limit)
+
+    def hash_id(grid_ids):
+        hash_code = 0  # 不会超过limit的4次方
+        for i in range(len(grid_ids)):
+            hash_code += power_limit ** i * grid_ids[i]
+        return hash_code
+
+    # 返回一个点周围半径r格以内的所有hash code
+    def neighbor_hash(grid_vec, r):
+        codes = []
+        for x in range(grid_vec[0] - r, grid_vec[0] + r + 1):
+            for y in range(grid_vec[1] - r, grid_vec[1] + r + 1):
+                for z in range(grid_vec[2] - r, grid_vec[2] + r + 1):
+                    codes.append(hash_id([x, y, z]))
+        return codes
+
+    body_table = dict()
+    for i in range(len(body.vertices)):
+        v = body.vertices[i]
+        hash_code = hash_id(gridify(v))
+        if hash_code in body_table:
+            body_table[hash_code].append(i)
+        else:
+            body_table[hash_code] = [i]
+
+    cloth_vert_num = cloth.vertices.__len__()
+    closest_vertices_mapping = np.zeros(cloth_vert_num, 'i')
+    closest_faces_mapping = np.zeros(cloth_vert_num, 'i')
+    closest_faces_uv = np.zeros((cloth_vert_num, 2))
+
+    search_radius = 2
+
+    def solve_uv(p, p1, p2, p3):
+        b = p - p1
+        b = np.reshape(b, (3, 1))
+        u_factor = p2 - p1
+        v_factor = p3 - p1
+        w = np.hstack((np.reshape(u_factor, (3, 1)), np.reshape(v_factor, (3, 1))))
+        wpinv = np.linalg.pinv(w)
+        res = np.matmul(wpinv, b).reshape(2)
+        return res[0], res[1]
+
+    bvs = body.vertices
+    cvs = cloth.vertices
+    for i in range(len(cvs)):
+
+        min_dist = math.inf
+        min_i = -1
+
+        close_faces_set = set()
+
+        v = cvs[i]
+        ids = gridify(v)
+        neighbor_codes = neighbor_hash(ids, search_radius)
+        for c in neighbor_codes:
+            if c in body_table:
+                for bi in body_table[c]:
+                    # 把顶点相关的面记录下来
+                    for f in body.vertex_face_map[bi]:
+                        close_faces_set.add(f)
+                    ds = np.dot(bvs[bi] - v, bvs[bi] - v)
+                    if ds < min_dist:
+                        min_dist = ds
+                        min_i = bi
+
+        closest_vertices_mapping[i] = min_i
+
+        def point_to_face_dist(v, a, b, c):
+            n = calc_normal(a, b, c)
+            n = n / np.linalg.norm(n)
+            dot = np.dot((v - a), n)
+            return abs(dot), v - dot * n
+
+        # 计算最近的面
+        min_face_dist = math.sqrt(min_dist)
+        min_face_i = -1
+        min_uv = [-1, -1]
+
+        for f in close_faces_set:
+            face = body.faces[f]
+            ds, anchor = point_to_face_dist(v, bvs[face[0]], bvs[face[1]], bvs[face[2]])
+            # 如果没有落在内部
+            uu, vv = solve_uv(anchor, bvs[face[0]], bvs[face[1]], bvs[face[2]])
+            if not (uu >= 0 and vv >= 0 and uu + vv <= 1):
+                continue
+            # 如果落在内部
+            if ds < min_face_dist:
+                min_face_dist = ds
+                min_face_i = f
+                min_uv = [uu, vv]
+        closest_faces_mapping[i] = min_face_i
+        closest_faces_uv[i] = min_uv
+
+    return closest_vertices_mapping, closest_faces_mapping, closest_faces_uv
+
+
 class ClosestVertex:
     def __init__(self):
         self.relation = []
@@ -216,6 +328,142 @@ class ClosestVertex:
         return rela
 
 
+class VertexMapping:
+    def __init__(self):
+        self.to_mesh = Mesh()
+        self.from_mesh = Mesh()
+        self.v_map = np.array([])
+        self.f_map = np.array([])
+        self.uv = np.array([])
+
+    def calc(self):
+        self.v_map, self.f_map, self.uv = get_closest_faces(self.to_mesh, self.from_mesh)
+        return self
+
+    def save(self, path):
+        from com.path_helper import save_json
+        obj = dict()
+        obj['v'] = self.v_map
+        obj['f'] = self.f_map
+        obj['u'] = self.uv
+        save_json(obj, path)
+        return self
+
+    def load(self, path):
+        from com.path_helper import load_json
+        obj = load_json(path)
+        self.v_map = np.array(obj['v'], 'i')
+        self.f_map = np.array(obj['f'], 'i')
+        self.uv = np.array(obj['u'])
+        return self
+
+    def transfer(self, vert_prop_array: np.ndarray):
+        shape = list(vert_prop_array.shape)
+        shape[0] = len(self.to_mesh.vertices)
+        res = np.zeros(shape)
+        for i in range(shape[0]):
+            uu = self.uv[i][0]
+            vv = self.uv[i][1]
+            if uu > 0 and vv > 0 and uu + vv < 1:
+                def w(ti):
+                    return vert_prop_array[self.from_mesh.faces[self.f_map[i]][ti]]
+
+                res[i] = (1 - uu - vv) * w(0) + uu * w(1) + vv * w(2)
+            else:
+                res[i] = vert_prop_array[self.v_map[i]]
+        return res
+
+
+
+
 if __name__ == '__main__':
-    pass
+    from com.posture.smpl import SMPLModel, apply, dis_apply
+    smpl = SMPLModel(r'D:\Educate\CAD-CG\GitProjects\LBAC\db\model\smpl.pkl')
+    c = Mesh().load(r'D:\Educate\CAD-CG\GitProjects\LBAC\db\gt\beta\1\template.obj')
+    b = Mesh().from_vertices(smpl.verts, smpl.faces)
+    b.compute_vertex_normal()
+
+    def save_weights():
+        get_map()
+        cvn = len(c.vertices)
+        weights = np.zeros((cvn, 24))
+        for i in range(cvn):
+            uu = mapping.uv[i][0]
+            vv = mapping.uv[i][1]
+            if uu > 0 and vv > 0 and uu + vv < 1:
+                def w(ti):
+                    return smpl.weights[b.faces[mapping.f_map[i]][ti]]
+                weights[i] = (1 - uu - vv) * w(0) + uu * w(1) + vv * w(2)
+            else:
+                weights[i] = smpl.weights[mapping.v_map[i]]
+        from com.path_helper import save_json, conf_path
+
+        save_json(weights, conf_path('weights-tst.json', 'tst'))
+
+
+    def tst_weights():
+        from com.path_helper import load_json, conf_path
+        weights = np.array(load_json(conf_path(r'model\relation\cloth_weights_7366.json')))
+        print(weights)
+
+        smpl.set_params(pose=np.random.random((24, 3))*0.1)
+
+        c.vertices = apply(smpl, weights, c.vertices)
+        c.vertices = dis_apply(smpl, weights, c.vertices)
+        # apply(smpl, smpl.weights, b.vertices)
+        from lbac.display.stage import view_mesh
+        view_mesh(c)
+
+    a = 1
+    mapping = VertexMapping()
+    mapping.to_mesh = c
+    mapping.from_mesh = b
+
+    def save_map():
+        from com.path_helper import conf_path
+        mapping.calc()
+        mapping.save(conf_path('tst-mapping.json', 'tst'))
+
+    def get_map():
+        from com.path_helper import conf_path
+        mapping.load(conf_path('tst-mapping.json', 'tst'))
+
+    def tst_map():
+        get_map()
+        cvn = len(c.vertices)
+        for i in range(cvn):
+            c.vertices[i] = b.vertices[b.faces[mapping.f_map[i]][0]]
+            # c.vertices[i] = b.vertices[mapping.v_map[i]]
+        from lbac.display.stage import view_mesh
+        view_mesh(c)
+
+    a = 1
+    # save_weights()
+    tst_weights()
+
+    # def solve_uv(p, p1, p2, p3):
+    #     b = p - p1
+    #     b = np.reshape(b, (3, 1))
+    #     u_factor = p2 - p1
+    #     v_factor = p3 - p1
+    #     w = np.hstack((np.reshape(u_factor, (3, 1)), np.reshape(v_factor, (3, 1))))
+    #     wpinv = np.linalg.pinv(w)
+    #     res = np.matmul(wpinv, b).reshape(2)
+    #     return res[0], res[1]
+    #
+    # def point_to_face_dist(v, a, b, c):
+    #     n = calc_normal(a, b, c)
+    #     n = n / np.linalg.norm(n)
+    #     dot = np.dot((v - a), n)
+    #     return abs(dot), v - dot * n
+    #
+    # p = np.array([0, 1, 0])
+    # p1 = np.array([-1, 0, -1])
+    # p2 = np.array([1, 0, 0])
+    # p3 = np.array([0, 0, 1])
+    # ds, anc = point_to_face_dist(p, p1, p2, p3)
+    # print(ds, anc)
+
+
+
 

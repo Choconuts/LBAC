@@ -5,14 +5,25 @@ from lbac.train.shape_gt import BetaGroundTruth, parse_sim, parse_ext
 from com.mesh.closest_vertex import ClosestVertex
 from com.posture.smpl import *
 
+loaded_cloth_weights = None
+
+
+def get_cloth_weights(cloth: Mesh, body: Mesh, pose, smpl, beta):
+    global loaded_cloth_weights
+    if loaded_cloth_weights is None:
+        loaded_cloth_weights = np.array(load_json(conf_path(r'model/relation/cloth_weights_7366.json')))
+    return loaded_cloth_weights
+
 
 beta_gt = BetaGroundTruth()
 relation = ClosestVertex()
 smpl = None
+smooth_times = 0
 
 
-def gen_pose_gt_data(ext_dir, beta_dir, gt_dir, gen_range=None):
-    global smpl
+def gen_pose_gt_data(ext_dir, beta_dir, gt_dir, gen_range=None, smooth=0):
+    global smpl, smooth_times
+    smooth_times = smooth
     smpl = SMPLModel(conf_path('smpl'))
     meta, valid_dict = parse_ext(ext_dir)
 
@@ -67,16 +78,18 @@ def gen_pose_gt_data(ext_dir, beta_dir, gt_dir, gen_range=None):
 
 def process(mesh, beta, pose):
     beta_a = np.array(beta)
-    relation.load(conf_path('vert_rela'))
-    rela = relation.get_rela()
-    body_weights = smpl.weights
-    cloth_weights = np.zeros((len(mesh.vertices), 24))
+    beta_full = np.hstack((beta_a, np.zeros(6)))
 
-    for i in range(len(mesh.vertices)):
-        cloth_weights[i] = body_weights[rela[i]]
-    smpl.set_params(pose=np.array(pose))
+    body = Mesh().from_vertices(smpl.verts, smpl.faces)
+
+    cloth_weights = get_cloth_weights(cloth=mesh, body=body, beta=beta, pose=pose, smpl=smpl)
+    smpl.set_params(pose=np.array(pose), beta=beta_full)    # 之前忘记设置pose和beta了
     mesh.vertices = dis_apply(smpl, cloth_weights, mesh.vertices)
     mesh.update()
+
+    # # 把smooth改到了还原姿势的后面，比较鲁棒
+    # if smooth_times > 0:
+    #     smooth(mesh, smooth_times)
 
     disp = mesh.vertices - beta_gt.template.vertices
 
@@ -204,6 +217,16 @@ class PoseGroundTruth(GroundTruth):
         ids = self.batch_manager.get_batch(size)
         if last > self.batch_manager.pointer:
             self.batch_manager.shuffle()
+        batch = [[], []]
+        for id in ids:
+            sample = self.samples[id].derefer()
+            batch[0].append(sample[0])
+            batch[1].append(sample[1])
+        return batch
+
+    def get_test(self):
+        ids = self.batch_manager.get_test()
+
         batch = [[], []]
         for id in ids:
             sample = self.samples[id].derefer()

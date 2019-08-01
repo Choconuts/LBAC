@@ -16,6 +16,8 @@ keep_probability = 0.9      # 保持率
 test_flag = False           # 测试
 save_step = 100             # saving
 graph_id = 'gru'            # id
+l1_regular_scale = 0          # l1 正则化
+l2_regular_scale = 0          # l2 正则化
 
 
 def single_layer_static_gru(input_x, n_steps, n_hidden):
@@ -32,8 +34,19 @@ def single_layer_static_gru(input_x, n_steps, n_hidden):
     # 如果是调用的是静态rnn函数，需要这一步处理   即相当于把序列作为第一维度
     input_x1 = tf.unstack(input_x, num=n_steps, axis=1)
 
-    # 可以看做隐藏层
-    gru_cell = tf.contrib.rnn.GRUCell(num_units=n_hidden)
+    # 换一种实现
+    # gru_cell = tf.contrib.rnn.GRUCell(num_units=n_hidden)
+    gru_cell = tf.keras.layers.GRUCell(
+        units=n_hidden,
+        use_bias=True,
+        kernel_initializer=tf.keras.initializers.orthogonal,
+        dropout=1 - keep_probability,
+        recurrent_dropout=1 - keep_probability,
+        recurrent_initializer=tf.keras.initializers.orthogonal,
+        kernel_regularizer=tf.keras.regularizers.l1_l2,
+        bias_regularizer=tf.keras.regularizers.l1_l2
+    )
+    # gru_cell = tf.nn.rnn_cell.DropoutWrapper(cell=gru_cell, output_keep_prob=keep_probability)
     # 静态rnn函数传入的是一个张量list  每一个元素都是一个(batch_size,n_input)大小的张量
     hiddens, states = tf.contrib.rnn.static_rnn(cell=gru_cell, inputs=input_x1, dtype=tf.float32)
 
@@ -53,15 +66,28 @@ def graph():
     # 取 RNN 最后一个时序的输出，然后经过全连接网络得到输出值
     hidden = tf.nn.dropout(hidden, keep_prob)
     print(np.shape(hidden))
-    output = tf.contrib.layers.fully_connected(inputs=hidden, num_outputs=n_output, activation_fn=None)
+    # output = tf.contrib.layers.fully_connected(inputs=hidden, num_outputs=n_output, activation_fn=None)
+    dense = tf.keras.layers.Dense(
+        units=n_output,
+        use_bias=True,
+        kernel_initializer=tf.keras.initializers.orthogonal,
+        kernel_regularizer=tf.keras.regularizers.l1_l2,
+    )
+    output = dense(hidden)
     print(np.shape(output))
-
+    print(tf.get_collection(tf.GraphKeys.WEIGHTS))
     '''
     设置对数似然损失函数
     '''
+    # l1_regularizer = tf.contrib.layers.l1_regularizer(l1_regular_scale, scope=None)
+    # l2_regularizer = tf.contrib.layers.l2_regularizer(l2_regular_scale, scope=None)
+    # regularizer = tf.contrib.layers.sum_regularizer([l1_regularizer, l2_regularizer], scope=None)
+    # regular_loss = tf.contrib.layers.apply_regularization(regularizer, weights_list=None)
+
     # 代价函数 J =-(Σy.logaL)/n    .表示逐元素乘
     y_true_t = tf.transpose(y_true, [1, 0, 2])
-    cross_entropy = tf.reduce_mean(tf.square(y_true_t[-1] - output[-1]))
+    # cross_entropy = tf.reduce_mean(tf.square(y_true_t[-1] - output[-1]))    # MSE
+    cross_entropy = tf.reduce_mean(tf.abs(y_true_t[-1] - output[-1]))    # MAE
 
     '''
     求解

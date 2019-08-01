@@ -21,6 +21,7 @@ def conf_path(key, base=None):
 
     path = conf_value(key)
     base_dir = get_base(base)
+
     if path is not None:
         path = os.path.join(base_dir, path)
         return path

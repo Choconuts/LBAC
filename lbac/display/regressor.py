@@ -22,12 +22,16 @@ class ShapeRegressor:
 
 class PoseRegressor:
 
-    def __init__(self, canvas, gru_model_path, n_step):
+    def __init__(self, canvas, gru_model_path, n_step, load_step=0):
         g = GraphBase(gru.graph_id)
         gru.n_steps = n_step
         gru.n_input = 76
         canvas.open()
-        canvas.load_graph(gru_model_path, g)
+        if load_step > 0:
+            canvas.load_graph_of_step(gru_model_path, g, load_step)
+        else:
+            canvas.load_graph(gru_model_path, g)
+
         g.predict_process = gru.predict_process
         self.gru = g
         self.canvas = canvas

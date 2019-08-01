@@ -18,3 +18,24 @@ class Timer:
         if self.print:
             print(msg, '%.6f' % (time.time() - self.last_time))
         return time.time() - self.last_time
+
+from functools import wraps
+
+def timing(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        start = time.time()
+        f(*args, **kwargs)
+        time_cost = time.time() - start
+        print("Time cost: %f" % time_cost)
+
+    return decorated
+
+
+if __name__ == '__main__':
+    @timing
+    def x():
+        for i in range(1000000):
+            f = 12 * 342 +1243
+
+    x()

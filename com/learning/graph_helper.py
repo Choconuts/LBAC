@@ -98,6 +98,11 @@ class GraphBase:
                 self.save_graph()
                 canvas.save_step(self.global_step)
 
+            if test and ground_truth.batch_manager.epoched:
+                print("an epoch finished")
+                self.test_step(sess, ground_truth.get_test())
+                ground_truth.batch_manager.epoched = False
+
         if test:
             self.test_step(sess, ground_truth.get_test())
 

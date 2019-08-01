@@ -32,6 +32,45 @@ def main():
     vf.close()
 
 
+def view_mesh(mesh):
+    global frame
+
+    frame = 0
+
+    def idle():
+        pass
+
+    def draw():
+        msr.render()
+
+    msr = MeshRenderer(mesh, [0.8, 0.8, 0.8])
+    set_display(draw)
+    set_callbacks(idle)
+    set_init(init_array_renderer)
+    run_glut()
+
+
+def view_meshes(meshes):
+    global frame
+
+    frame = 0
+
+    def idle():
+        pass
+
+    def draw():
+        for msr in msrs:
+            msr.render()
+
+    msrs = []
+    for mesh in meshes:
+        msrs.append(MeshRenderer(mesh, [0.8, 0.8, 0.8]))
+    set_display(draw)
+    set_callbacks(idle)
+    set_init(init_array_renderer)
+    run_glut()
+
+
 def tst_train_data():
     global vf, frame
     if vf is None:

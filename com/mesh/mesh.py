@@ -119,6 +119,7 @@ class Mesh:
         if obj_file_path is not None:
             obj = OBJ(obj_file_path[0:g[0]], obj_file_path[g[0]:g[1]])
             vertices.extend(obj.vertices)
+            self.normal = np.array(obj.normals)
             for f in obj.faces:
                 face = [f[0][0] - 1, f[0][1] - 1, f[0][2] - 1]
                 self.faces.append(face)
@@ -180,6 +181,9 @@ class Mesh:
                 fp.write('v %f %f %f\n' % (v[0], v[1], v[2]))
             for f in np.array(self.faces) + 1:
                 fp.write('f %d %d %d\n' % (f[0], f[1], f[2]))
+            if self.normal:
+                for v in self.normal:
+                    fp.write('vn %f %f %f\n' % (v[0], v[1], v[2]))
         return self
 
     def to_vertex_buffer(self):

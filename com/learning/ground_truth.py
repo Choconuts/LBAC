@@ -40,6 +40,7 @@ class BatchManager:
         self.train_cut = cut
         self.element = np.linspace(0, max_num - 1, max_num).astype('i')
         self.auto_shufle = False
+        self.epoched = False
 
     def cut(self, new_cut):
         if self.train_cut > new_cut:
@@ -60,6 +61,8 @@ class BatchManager:
     def get_batch(self, size):
         tmp_ptr = self.pointer
         self.pointer += size
+        if self.pointer >= self.train_cut:
+            self.epoched = True
         self.pointer %= self.train_cut
         return self.get_range(tmp_ptr, tmp_ptr + size)
 
@@ -69,6 +72,9 @@ class BatchManager:
             ii = i % self.train_cut
             res.append(self.element[ii])
         return res
+
+    def get_test(self):
+        return self.element[self.train_cut:]
 
 
 if __name__ == '__main__':

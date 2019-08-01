@@ -36,10 +36,15 @@ def read_vertex_relation(path=None):
     if beta_gt is None:
         beta_gt = BetaGroundTruth().load(conf_path('beta_gt'))
     if cloth_weights is None:
-        cloth_weights = np.zeros((len(beta_gt.template.vertices), 24))
-        rela = relation.get_rela()
-        for i in range(len(beta_gt.template.vertices)):
-            cloth_weights[i] = read_smpl().weights[rela[i]]
+        if False:
+            # old transfer
+            cloth_weights = np.zeros((len(beta_gt.template.vertices), 24))
+            rela = relation.get_rela()
+            for i in range(len(beta_gt.template.vertices)):
+                cloth_weights[i] = read_smpl().weights[rela[i]]
+        else:
+            # new transfer
+            cloth_weights = np.array(load_json(conf_path(r'model\relation\cloth_weights_7366.json')))
 
 
 def show_sequence_mesh(seq: Sequence, meshes, meshes_changer):
@@ -210,7 +215,7 @@ def show_pose_seq(pose_seq):
 
 def show_seqs(beta: np.ndarray = None, pose_seq: Sequence = None, beta_disp: np.ndarray = None,
               pose_disp_seq: Sequence = None, show_body: bool = False):
-    global beta_gt
+    global beta_gt, smpl
     if beta_gt is None:
         beta_gt = BetaGroundTruth().load(conf_path('beta_gt'))
 
@@ -220,12 +225,15 @@ def show_seqs(beta: np.ndarray = None, pose_seq: Sequence = None, beta_disp: np.
         beta = np.hstack(beta, np.zeros(6))
     verts_temp = np.copy(beta_gt.template.vertices)
     frame_num = 1
-    if pose_seq:
-        frame_num = pose_seq.get_frame_num()
-    elif pose_disp_seq:
-        frame_num = pose_disp_seq.get_frame_num()
 
     index_seq = Sequence()
+
+    if pose_seq:
+        frame_num = pose_seq.get_frame_num()
+        index_seq.set_frame_rate(pose_seq.get_frame_rate())
+    elif pose_disp_seq:
+        frame_num = pose_disp_seq.get_frame_num()
+        index_seq.set_frame_rate(pose_disp_seq.get_frame_rate())
     index_seq.data = np.linspace(0, frame_num - 1, frame_num)
 
     meshes = [Mesh(beta_gt.template)]
