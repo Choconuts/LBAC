@@ -53,15 +53,52 @@ def single_layer_static_gru(input_x, n_steps, n_hidden):
     return hiddens, states
 
 
+def single_layer_dynamic_gru(input_x, n_steps, n_hidden, seq_len):
+    '''
+    返回静态单层GRU单元的输出，以及cell状态
+
+    args:
+        input_x:输入张量 形状为[batch_size,n_steps,n_input]
+        n_steps:时序总数
+        n_hidden：gru单元输出的节点个数 即隐藏层节点数
+    '''
+
+    # 把输入input_x按列拆分，并返回一个有n_steps个张量组成的list 如batch_sizex28x28的输入拆成[(batch_size,28),((batch_size,28))....]
+    # 如果是调用的是静态rnn函数，需要这一步处理   即相当于把序列作为第一维度
+
+    # input_x1 = tf.unstack(input_x, num=n_steps, axis=1)
+    input_x1 = tf.transpose(input_x, [1, 0, 2])
+
+    # 换一种实现
+    # gru_cell = tf.contrib.rnn.GRUCell(num_units=n_hidden)
+    gru_cell = tf.keras.layers.GRUCell(
+        units=n_hidden,
+        use_bias=True,
+        kernel_initializer=tf.keras.initializers.orthogonal,
+        dropout=1 - keep_probability,
+        recurrent_dropout=1 - keep_probability,
+        recurrent_initializer=tf.keras.initializers.orthogonal,
+        kernel_regularizer=tf.keras.regularizers.l1_l2,
+        bias_regularizer=tf.keras.regularizers.l1_l2
+    )
+    # gru_cell = tf.nn.rnn_cell.DropoutWrapper(cell=gru_cell, output_keep_prob=keep_probability)
+    # 静态rnn函数传入的是一个张量list  每一个元素都是一个(batch_size,n_input)大小的张量
+    hiddens, states = tf.nn.dynamic_rnn(cell=gru_cell, inputs=input_x1, dtype=tf.float32, sequence_length=seq_len, time_major=True)
+
+    return hiddens, states
+
+
 def graph():
     # 定义占位符
     # batch_size：表示一次的批次样本数量batch_size  n_steps：表示时间序列总数  n_input：表示一个时序具体的数据长度  即一共28个时序，一个时序送入28个数据进入 RNN 网络
     x_input = tf.placeholder(dtype=tf.float32, shape=[None, n_steps, n_input], name="x")
     y_true = tf.placeholder(dtype=tf.float32, shape=[None, n_steps, n_output], name="y")
+    seq_lens = tf.placeholder(tf.int32, shape=[None], name="length")
     keep_prob = tf.placeholder(tf.float32, name="keep_prob")
 
     # 可以看做隐藏层
-    hidden, states = single_layer_static_gru(x_input, n_steps, n_hidden[0])
+    # hidden, states = single_layer_static_gru(x_input, n_steps, n_hidden[0])
+    hidden, states = single_layer_dynamic_gru(x_input, n_steps, n_hidden[0], seq_lens)
 
     # 取 RNN 最后一个时序的输出，然后经过全连接网络得到输出值
     hidden = tf.nn.dropout(hidden, keep_prob)
@@ -101,28 +138,7 @@ def graph():
     # 预测结果评估
     pose_accuracy = cross_entropy  # 求损失
 
-    return [train_step], [x_input, keep_prob, y_true], None, cross_entropy, output[-1] # TODO
-
-
-def sequence_slice(seq, length):
-    res = []
-    for i in range(length - n_steps + 1):
-        res.append(np.array([seq[i:i + n_steps]]))
-
-    return np.concatenate(res, 0)
-
-
-def batch_slice(batch):
-    res = [[], [], []]
-    for i in range(len(batch[0])):
-        # 注意，要改回动态必须改这里S！！！！！！
-        res[0].append(sequence_slice(batch[0][i], n_steps))
-        res[1].append(sequence_slice(batch[1][i], n_steps))
-    res[0] = np.concatenate(res[0])
-    res[1] = np.concatenate(res[1])
-    for i in range(len(res[0])):
-        res[2].append(n_steps)
-    return res
+    return [train_step], [x_input, keep_prob, y_true, seq_lens], None, cross_entropy, output[-1] # TODO
 
 
 def batch_process(batch: list, is_train, local_step):
@@ -139,7 +155,7 @@ def batch_process(batch: list, is_train, local_step):
         batch.insert(1, keep_probability)
     else:
         batch.insert(1, 1)
-
+    batch.append(np.ones((batch_size)) * n_steps)
     return batch
 
 
@@ -156,7 +172,8 @@ def predict_process(batch: list, is_test):
     batch[0] = np.array(batch[0])[-n_steps:].reshape((-1, n_steps, n_input))
     batch.insert(1, 1)
     batch.insert(2, None)
-    return batch[0:3]
+    batch.insert(3, np.ones((batch_size)) * n_steps)
+    return batch[0:4]
 
 
 def bind(g: GraphBase):

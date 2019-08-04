@@ -2,7 +2,7 @@ from lbac.sequence.pose_translator import *
 from lbac.sequence.reader import *
 from com.sequence.sequence import *
 from lbac.display.seq_show import *
-from tst.workspace.seq_cut import process_seqs
+from tst.workspace.seq_cut_0 import process_seqs
 
 
 def get_pose_sequence():

@@ -33,6 +33,7 @@ def gen_pose_gt_data(ext_dir, beta_dir, gt_dir, gen_range=None, smooth=0):
 
     beta_gt.load(beta_dir)
 
+    # 如果不划定范围，就从extract meta里读取所有有效序列（帧数大于插值数的
     if gen_range is None:
         gen_range = []
         for seq_idx in valid_dict:
@@ -45,20 +46,24 @@ def gen_pose_gt_data(ext_dir, beta_dir, gt_dir, gen_range=None, smooth=0):
     if not exists(gt_dir):
         os.makedirs(gt_dir)
 
+    # 从合法的列表里筛选
     meta['index'] = dict()
     for seq_idx in gen_range:
         frames = valid_dict[seq_idx]
         seq_idx = int(seq_idx)
         try:
+            # 每个序列的meta信息（包括bp数据
             seq_meta, frame_num, beta, poses = parse_sim(join(ext_dir, str5(seq_idx)))
         except Exception as e:
             print(seq_idx, e)
             continue
         print(seq_idx)
         if frames != frame_num:
+            # 最终使用的还是parse出来的frame num
             print('warning: invalid seq frames record')
             frames = frame_num
         disps = []
+        # 生成disp数据
         for i in range(len(poses)):
             mesh_i = Mesh().load(join(ext_dir, str5(seq_idx), str4(i) + '.obj'))
             print(frames, len(poses))
@@ -66,6 +71,7 @@ def gen_pose_gt_data(ext_dir, beta_dir, gt_dir, gen_range=None, smooth=0):
             disps.append(disp)
         meta['index'][seq_idx] = len(disps)
 
+        # 把这个序列的所有有效数据合起来，保存成一个json，方便按序列读取
         data = dict()
         data['disps'] = np.array(disps).tolist()
         data['poses'] = poses
@@ -73,15 +79,24 @@ def gen_pose_gt_data(ext_dir, beta_dir, gt_dir, gen_range=None, smooth=0):
         print(join(gt_dir, str5(seq_idx) + '.json'))
         save_json(data, join(gt_dir, str5(seq_idx) + '.json'))
 
+    # pose gt的meta
     save_json(meta, join(gt_dir, 'meta.json'))
 
 
 def process(mesh, beta, pose):
+    """
+    获取姿势模型的displacement
+    :param mesh:
+    :param beta:
+    :param pose:
+    :return:
+    """
+    # beta处理
     beta_a = np.array(beta)
     beta_full = np.hstack((beta_a, np.zeros(6)))
 
+    # pose消除（目前直接读取保存的weights
     body = Mesh().from_vertices(smpl.verts, smpl.faces)
-
     cloth_weights = get_cloth_weights(cloth=mesh, body=body, beta=beta, pose=pose, smpl=smpl)
     smpl.set_params(pose=np.array(pose), beta=beta_full)    # 之前忘记设置pose和beta了
     mesh.vertices = dis_apply(smpl, cloth_weights, mesh.vertices)
@@ -104,6 +119,7 @@ def process(mesh, beta, pose):
         print('warning: missing beta gt')
         return None
 
+    # beta disp消除
     beta_disp = beta_gt.data['disps'][str(beta_id)]
 
     return disp - beta_disp
@@ -180,6 +196,7 @@ class PoseGroundTruth(GroundTruth):
 
         self.load_data(gt_dir)
 
+        self.samples = []
         data = (self.mapping, self.data, self.step, self.stride)
         for i in range(len(self.mapping)):
             sample = PoseSampleId(i, data)
@@ -191,6 +208,7 @@ class PoseGroundTruth(GroundTruth):
         self.meta = load_json(join(gt_dir, 'meta.json'))
         index = self.meta['index']
         new_index = dict()
+        # total是全部的X帧切片数量
         total = 0
         for i in index:
             if index[i] < self.step:
@@ -202,9 +220,9 @@ class PoseGroundTruth(GroundTruth):
             total += new_index[i]
             for j in range(new_index[i]):
                 self.mapping.append((i, j))
+        print("total sample:", total)
         max_num = total
         self.batch_manager = BatchManager(max_num, max_num - self.test_cut)
-        self.samples = []
         self.index = new_index
 
     def load_data(self, gt_dir):

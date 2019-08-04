@@ -13,8 +13,10 @@ flags.DEFINE_string('dir', 'rd', 'r(relative) a(absolute), or d(relative to db),
 flags.DEFINE_string('in', conf_path('seq_poses_json'), 'input poses json file, list of sequences')
 flags.DEFINE_integer('lerp', 10, 'interpolate frames num')
 flags.DEFINE_integer('shape', 1, 'the first one, or first 17 shapes')
-flags.DEFINE_string('type', 'a', 'shape or pose, or pose from amc')         # s
-flags.DEFINE_bool('continue', False, 'interpolate frames num')
+flags.DEFINE_string('type', 'a', 'shape or pose, or pose from amc, should be json translator')         # s
+flags.DEFINE_bool('continue', False, 'continue last building')
+flags.DEFINE_integer('s', 0, 'start')
+flags.DEFINE_integer('e', -1, 'end')
 
 
 def get_dir(key, i):
@@ -44,6 +46,12 @@ def main(argv):
             set_default_translator(JsonTranslator())
         in_dir = get_dir('in', 0)
         set_smpl(SMPLModel(conf_path('smpl')))
+
+        sp = SpecialMapper()
+        sp.start = FLAGS.s
+        sp.end = FLAGS.e
+
+        set_mapper(sp)
         build_poses_sequence(out_dir, in_dir, range(FLAGS.shape), FLAGS.lerp)
 
 

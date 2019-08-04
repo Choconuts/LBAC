@@ -5,8 +5,10 @@ import os
 import json
 import itertools
 from lbac.sequence.pose_translator import JsonTranslator, PoseTranslator
+from lbac.sequence.database_128 import *
 
 default_translator = JsonTranslator()
+default_mapper = PoseBetaMapper()
 
 
 def set_default_translator(translator: PoseTranslator):
@@ -21,6 +23,12 @@ no_log = False
 continue_flag = False
 
 frame_log_step = 10
+
+
+def set_mapper(mapper):
+    global default_mapper
+    default_mapper = mapper
+
 
 def set_smpl(smpl_model):
     global smpl
@@ -156,6 +164,8 @@ def pose_sequences(base_dir, pose_beta_pairs):
         poses = pair[0]
         # warning
         # conflicts avoiding
+        # 这里如果没有continue，也是不会去覆盖已经有的seq的， 但是会重新从头开始
+        # 如果有continue，会找到最后一个dir，在其中继续模拟；会跳过前面的
         if not continue_flag:
             while exists(join(base_dir, 'seq_' + str5(i))):
                 i += 1
@@ -196,7 +206,10 @@ def build_poses_sequence(out_dir, poses_json, shapes_range, interp=20):
         betas = interpolate_param(np.zeros((10)), shape, interp)
         betas_list.append(betas)
 
-    prod = itertools.product(poses_list, betas_list)
+    # prod = itertools.product(poses_list, betas_list)
+    default_mapper.poses_list = poses_list
+    default_mapper.betas_list = betas_list
+    prod = default_mapper.get_pairs()
 
     pose_sequences(out_dir, prod)
 

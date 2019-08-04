@@ -44,7 +44,7 @@ def graph():
     x_input = tf.placeholder(tf.float32, shape=[None, n_input], name="x")
     y_true = tf.placeholder(tf.float32, shape=[None, n_output], name="y")
 
-    # 第1、2、3层: 全连接
+    # 第1、2、3层: 全连接，这个是我自己实现的全连接
     full = x_input
     for h in n_hidden:
         if h == 0:

@@ -138,10 +138,17 @@ def main(argv):
         for graph in graphs:
             module = getattr(th, graph)
             print('config: ', config[graph])
-            gt = getattr(th, str(config[graph]['gt'][0])).load(config[graph]['gt'][1])
-            if "test_cut" in config[graph]:
-                gt.batch_manager.cut(gt.batch_manager.max_num - config[graph]["test_cut"])
-            train(module, gt)
+            gt_type = getattr(th, str(config[graph]['gt'][0]))
+            if "rnn_step" in config[graph]:
+                if "test_cut" in config[graph]:
+                    gt = gt_type(step=config[graph]['rnn_step'], cut_off=test_cut)
+                else:
+                    gt = gt_type(step=config[graph]['rnn_step'])
+            elif "test_cut" in config[graph]:
+                gt = gt_type(cut=test_cut)
+            else:
+                gt = gt_type()
+            train(module, gt.load(config[graph]['gt'][1]))
 
 
 if __name__ == '__main__':

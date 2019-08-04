@@ -10,8 +10,8 @@ from tst.tst_gt import TestGroundTruth, TestGroundTruth2
 from tst.joint20.skeleton_nn import SKLTGroundTruth
 
 
-beta = BetaGroundTruth()
-pose = PoseGroundTruth()
-test = TestGroundTruth()
-gru_test = TestGroundTruth2()
-sklt = SKLTGroundTruth()
+beta = BetaGroundTruth
+pose = PoseGroundTruth
+test = TestGroundTruth
+gru_test = TestGroundTruth2
+sklt = SKLTGroundTruth

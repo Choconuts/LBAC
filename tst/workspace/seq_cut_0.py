@@ -12,6 +12,7 @@ from com.posture.smpl import *
 
 angle = 10
 
+
 def rotate(mat, ax, angle):
     rot = transforms3d.axangles.axangle2mat(ax, math.radians(angle))
     return np.matmul(rot, mat)
@@ -43,11 +44,12 @@ def process_seqs(seqs):
 
 
 def cut():
-    in_file = 'db/raw/pose/seqs_128_r.json'
-    v_file = 'tst/workspace/valid-odd.json'
+    in_file = conf_path('temp/128_r.json')
+    v_file = 'valid-20.json'
 
     valids = load_json(v_file)
     raw_data = load_json(in_file)
+    print(len(valids))
     data = []
     for v in valids:
         seq = raw_data[v]
@@ -70,29 +72,16 @@ def gen_new_poses():
     process_seqs(data)
     add_zero(data)
 
+    smpl = SMPLModel(conf_path('smpl'))
+    i = 0
+    for pose in data[1]:
+        smpl.set_params(np.array(pose))
+        smpl.save_to_obj('seq/' + str(i) + '.obj')
+        i += 1
+        if i > 10:
+            break
+
     out_file = 'pose_seq.json'
-    save_json(data, out_file)
-
-
-def produce_poses(in_file, valid_file, out_file, add_zero_flag=False):
-
-    def cut0():
-        valids = load_json(valid_file)
-        raw_data = load_json(in_file)
-        data = []
-        for v in valids:
-            seq = raw_data[v]
-            data.append(seq)
-
-        print(np.array(data).shape)
-
-        return data
-
-    data = cut0()
-    process_seqs(data)
-    if add_zero_flag:
-        add_zero(data)
-
     save_json(data, out_file)
 
 
