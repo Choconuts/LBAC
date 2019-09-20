@@ -15,11 +15,11 @@ def tst_amc_seq(seq_path):
     pose_seq.load(seq_path)
     # show_pose_seq_joints(pose_seq)
     print(pose_seq.time_step)
-    pose_seq.re_sampling(0.016)
+    pose_seq.re_sampling(0.033).slice(4, 10)
     disp_seq = predict_pose(pose_seq, model)
     show_seqs(
-        pose_disp_seq=disp_seq,
-        # pose_seq=pose_seq
+        # pose_disp_seq=disp_seq,
+        pose_seq=pose_seq
     )
     cloth_animation = ClothAnimation()
     # beta_gt = BetaGroundTruth().load(conf_path('beta_gt'))
@@ -43,7 +43,7 @@ def tst_amc_seq(seq_path):
 
 
 if __name__ == '__main__':
-    model = r'D:\Educate\CAD-CG\GitProjects\mae-1'
+    model = r'D:\Educate\CAD-CG\GitProjects\s80-2'
     seq_path = conf_path('tst_seqs/amc_13_29.json', 'tst')
     # seq_path = '../../tst/tst_seqs/test_pose_18.json'
 

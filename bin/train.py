@@ -141,11 +141,11 @@ def main(argv):
             gt_type = getattr(th, str(config[graph]['gt'][0]))
             if "rnn_step" in config[graph]:
                 if "test_cut" in config[graph]:
-                    gt = gt_type(step=config[graph]['rnn_step'], cut_off=test_cut)
+                    gt = gt_type(step=config[graph]['rnn_step'], cut_off=config[graph]["test_cut"])
                 else:
                     gt = gt_type(step=config[graph]['rnn_step'])
             elif "test_cut" in config[graph]:
-                gt = gt_type(cut=test_cut)
+                gt = gt_type(cut_off=config[graph]["test_cut"])
             else:
                 gt = gt_type()
             train(module, gt.load(config[graph]['gt'][1]))

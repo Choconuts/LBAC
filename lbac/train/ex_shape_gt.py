@@ -9,9 +9,9 @@ template = Mesh()
 betas = np.zeros(0)
 zero_shape_index = -1
 
-ex_dir = conf_path('exter/')
+ex_dir = r'D:\Educate\CAD-CG\GitProjects\shape'
 cloth_dir = 'shapeModel2019-6-19'
-topo_file = 'triangles_clt.txt'
+topo_file = 'triangles.txt'
 
 faces = np.zeros(0)
 
@@ -74,7 +74,7 @@ def ex_beta_mesh(i):
     global faces
     if faces is None or len(faces) == 0:
         faces = txt_to_array_3(join(ex_dir, topo_file), 'i')
-    # faces -= 1
+        faces -= 1
     mesh = Mesh().from_vertices(vertices, faces)
     mesh.update()
     return mesh
@@ -88,6 +88,7 @@ def gen_beta_gt_data(gt_dir):
     for i in range(17):
         mesh = ex_beta_mesh(i)
         mesh.vertices = smooth_mesh(mesh).vertices
+        # mesh.save(conf_path('beta_%d.obj' % i, 'tst'))
         if i == zero_shape_index:
             global template
             template = mesh
@@ -162,12 +163,17 @@ def gen():
 
 
 def tst():
-    beta_gt = BetaGroundTruth().load(conf_path('gt/ex/beta/1'))
+    beta_gt = BetaGroundTruth().load(conf_path('gt/ex/beta/2019-6-19'))
 
     def pt(i):
         return conf_path('beta_' + str3(i) + '.obj', 'tst')
 
     print(beta_gt.data['betas'])
+    # print(beta_gt.template.vertices.__len__() * 3)
+
+    batch = beta_gt.get_batch(4)
+    print(np.shape(batch[0]))
+    print(np.shape(batch[1]))
 
     # for i in range(17):
     #     mesh = Mesh(beta_gt.template)
@@ -179,10 +185,10 @@ def tst():
 if __name__ == '__main__':
     """
     """
-    # tst()
-    # set_smooth_times(5)
+    tst()
+    # set_smooth_times(0)
     # mesh = ex_beta_mesh(0)
     # smooth_mesh(mesh)
     # mesh.save(conf_path('smooth.obj', 'tst'))
-    load_betas()
-    gen_beta_gt_data(conf_path('gt/ex/beta/2019-6-19'))
+    # load_betas()
+    # gen_beta_gt_data(conf_path('gt/ex/beta/2019-6-19'))

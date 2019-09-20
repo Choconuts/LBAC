@@ -1,4 +1,4 @@
-from com.learning import mlp, gru, ground_truth, graph_helper
+from com.learning import mlp, dygru, mlp_old, gru, ground_truth, graph_helper
 from absl import app
 from absl import flags
 import os

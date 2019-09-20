@@ -56,5 +56,5 @@ class PoseRegressor:
         x = np.array(self.input()).reshape(self.step, 72)
         b = np.zeros((self.step, 1)) + np.array(beta[0:4]).reshape((1, 4))
 
-        res = self.gru.predict(self.canvas.sess, [np.hstack((x, b))])[0]
+        res = self.gru.predict(self.canvas.sess, [np.hstack((x, b)), np.array([self.step])])[0]
         return np.array(res).reshape((7366, 3))

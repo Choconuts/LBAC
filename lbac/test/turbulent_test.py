@@ -8,7 +8,7 @@ pose_gt_dir = ''
 
 test_model_dir = ''
 
-gru_step = 5
+gru_step = 80
 
 load_step = -1
 
@@ -111,7 +111,7 @@ if __name__ == '__main__':
     model = conf_path('../../LBAC-EXDB/adj-3')
     model = r'D:\Educate\CAD-CG\GitProjects\adj-sm'
     model = conf_path('model/sgru/3')
-    model = r'D:\Educate\CAD-CG\GitProjects\mae-1'
+    model = r'D:\Educate\CAD-CG\GitProjects\s80-2'
     pose_seq = Sequence().load(path)
     pose_seq0 = pose_seq.copy()
 

@@ -2,6 +2,7 @@ import numpy as np
 import time
 from com.mesh.mesh import *
 import math
+from com.path_helper import *
 
 def get_closest_points(cloth, body):
     """
@@ -84,6 +85,8 @@ def get_closest_points(cloth, body):
         search_list = []
         layer = 0
         while True:
+            if layer >= len(resolutions):
+                raise Exception('hash grid not found')
             step = 1 / resolutions[layer]
             v0 = my_hash(v[0], step)
             v1 = my_hash(v[1], step)
@@ -111,6 +114,8 @@ def get_closest_points(cloth, body):
     # timer.tick('find')
 
     def travel():
+        if len(body.edges)== 0:
+            body.edges = Mesh(body).edges
         for i in range(len(cloth.vertices)):
             now = res[i]
             vc = cloth.vertices[i]
@@ -150,8 +155,7 @@ class Timer:
         return time.time() - self.last_time
 
 
-def get_closest_faces(cloth: Mesh, body: Mesh):
-    grid_width = 0.015
+def get_closest_faces(cloth: Mesh, body: Mesh, grid_width = 0.015):
 
     def gridify(x):
         return np.floor(x / grid_width).astype('i')
@@ -271,9 +275,7 @@ class ClosestVertex:
         return self.relation
 
     def save(self, file):
-        import json
-        with open(file, 'w') as fp:
-            json.dump(self.relation, fp)
+        save_json(self.relation, file)
         return self
 
     def load(self, file):
@@ -287,7 +289,8 @@ class ClosestVertex:
         self.relation = np.copy(self.relation0)
 
     def calc(self, cloth, body):
-        self.relation = get_closest_points(cloth, body)
+        closest_vertices_mapping, closest_faces_mapping, closest_faces_uv = get_closest_faces(cloth, body, 0.02)
+        self.relation = closest_vertices_mapping
         return self
 
     def update(self, cloth, body):

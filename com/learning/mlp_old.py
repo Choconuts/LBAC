@@ -44,29 +44,13 @@ def graph():
     x_input = tf.placeholder(tf.float32, shape=[None, n_input], name="x")
     y_true = tf.placeholder(tf.float32, shape=[None, n_output], name="y")
 
-    # 第1、2、3层: 全连接
+    # 第1、2、3层: 全连接，这个是我自己实现的全连接
     full = x_input
-    dropout = tf.keras.layers.Dropout(1 - keep_probability)
     for h in n_hidden:
         if h == 0:
             continue
-        dense = tf.keras.layers.Dense(
-            units=h,
-            use_bias=True,
-            # kernel_initializer=tf.keras.initializers.orthogonal,
-            # kernel_regularizer=tf.keras.regularizers.l1_l2,
-            activation=tf.nn.relu,
-        )
-        full = dense(full)
-        full = dropout(full)
-    dense = tf.keras.layers.Dense(
-        units=n_output,
-        use_bias=True,
-        # kernel_initializer=tf.keras.initializers.orthogonal,
-        # kernel_regularizer=tf.keras.regularizers.l1_l2,
-    )
-    output = dense(full)
-    output = dropout(output)
+        full = full_conn_layer(x_input, h, keep_prob, tf.nn.relu)
+    output = full_conn_layer(full, n_output, keep_prob, name="output")
 
     global_step = tf.Variable(0, trainable=False)
     rate = tf.train.exponential_decay(learning_rate,

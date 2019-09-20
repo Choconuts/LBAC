@@ -50,13 +50,10 @@ def view_mesh(mesh):
     run_glut()
 
 
-def view_meshes(meshes):
+def view_meshes(meshes, idle=None, key=None):
     global frame
 
     frame = 0
-
-    def idle():
-        pass
 
     def draw():
         for msr in msrs:
@@ -66,7 +63,7 @@ def view_meshes(meshes):
     for mesh in meshes:
         msrs.append(MeshRenderer(mesh, [0.8, 0.8, 0.8]))
     set_display(draw)
-    set_callbacks(idle)
+    set_callbacks(idle, key)
     set_init(init_array_renderer)
     run_glut()
 

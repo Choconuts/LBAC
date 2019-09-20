@@ -172,7 +172,6 @@ def predict_process(batch: list, is_test):
     batch[0] = np.array(batch[0])[-n_steps:].reshape((-1, n_steps, n_input))
     batch.insert(1, 1)
     batch.insert(2, None)
-    batch.insert(3, np.ones((batch_size)) * n_steps)
     return batch[0:4]
 
 
