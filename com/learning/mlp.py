@@ -46,7 +46,7 @@ def graph():
 
     # 第1、2、3层: 全连接
     full = x_input
-    dropout = tf.keras.layers.Dropout(1 - keep_probability)
+    dropout = tf.keras.layers.Dropout(1 - keep_prob)
     for h in n_hidden:
         if h == 0:
             continue
